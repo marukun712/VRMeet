@@ -209,10 +209,20 @@ export default function RoomComponent() {
         //dataStreamをpublishする
         await me.publish(dataStream);
 
-        room.members.forEach((e) => {
-            console.log(e)
+        //既に参加しているメンバーのモデルをロード
+        room.members.forEach(async (e) => {
+            if (e.state == "joined" && e.id !== myVRM.user.id) {
+                //VRMモデルの読み込み
+                let otherVRMModel: VRM = await VRMLoader("sample.vrm")
+                scene.add(otherVRMModel.scene);
+                otherVRMModel.scene.rotation.y = Math.PI;
+
+                let remoteMemberVRM: userAndVRMData = { user: e, vrm: otherVRMModel }
+                otherVRMData.push(remoteMemberVRM)
+            }
         })
 
+        //メンバーの参加時にモデルをロード
         room.onMemberJoined.add(async (e) => {
             //VRMモデルの読み込み
             let otherVRMModel: VRM = await VRMLoader("sample.vrm")
