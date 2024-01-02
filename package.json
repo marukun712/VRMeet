@@ -2,6 +2,7 @@
     "name": "kalidokit-react",
     "version": "0.1.0",
     "private": true,
+    "dev": "parcel ./src/index.html",
     "scripts": {
         "dev": "next dev",
         "build": "next build",
@@ -14,19 +15,24 @@
         "@mediapipe/holistic": "0.5.1635989137",
         "@mediapipe/pose": "^0.5.1675469404",
         "@pixiv/three-vrm": "0.6.7",
+        "@skyway-sdk/core": "^1.6.2",
+        "@skyway-sdk/room": "^1.6.1",
         "@types/three": "^0.131.0",
+        "@types/uuid": "^9.0.7",
         "daisyui": "^4.4.20",
         "kalidokit": "^1.1.5",
         "next": "14.0.4",
         "react": "^18",
         "react-dom": "^18",
-        "three": "0.133.0"
+        "three": "0.133.0",
+        "uuid": "^9.0.1"
     },
     "devDependencies": {
         "@types/node": "^20",
         "@types/react": "^18",
         "@types/react-dom": "^18",
         "autoprefixer": "^10.0.1",
+        "parcel": "^2.10.3",
         "postcss": "^8",
         "tailwindcss": "^3.3.0",
         "typescript": "^5"
