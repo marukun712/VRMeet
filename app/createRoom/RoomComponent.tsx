@@ -1,18 +1,12 @@
 import {
-    LocalAudioStream,
     LocalP2PRoomMember,
-    LocalStream,
-    LocalVideoStream,
     RoomPublication,
-    SkyWayAuthToken,
     LocalDataStream,
-    DataStreamMessageType,
     SkyWayContext,
     SkyWayRoom,
     SkyWayStreamFactory,
-    nowInSec,
-    uuidV4,
 } from "@skyway-sdk/room";
+import { v4 } from "uuid"
 import { useEffect, useState, useCallback, useRef } from "react";
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
@@ -21,14 +15,16 @@ import { VRMLoader } from '@/lib/motionCapture/VRMLoader';
 import { Holistic, Results } from '@mediapipe/holistic';
 import { Camera } from '@mediapipe/camera_utils';
 import { animateVRM } from "@/lib/motionCapture/animateVRM";
+import { getToken } from "@/lib/skyway/getToken";
 import { motionData, userAndVRMData } from "@/types";
 
-export default function RoomComponent() {
+export default function CreateRoomDynamicComponent() {
     const [scene, setScene] = useState<THREE.Scene>();
     const [myVRM, setMyVRM] = useState<userAndVRMData>();
+    const [shereLink, setShereLink] = useState<string>();
     const [dataStream, setDataStream] = useState<LocalDataStream>();
-
     const otherVRMData: userAndVRMData[] = []
+
     const cameraRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const effectRan = useRef(false)
@@ -78,30 +74,6 @@ export default function RoomComponent() {
         }
     }, [])
 
-    //トークンの取得
-    const getToken = async () => {
-        const response = await fetch("/api/getSkyWayToken", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-        const apiResponse = await response.json();
-        if (response.ok) {
-            if (apiResponse.isSuccess) {
-                //token
-                const apiResponseBody = apiResponse.body;
-                return apiResponseBody.skywayToken;
-            } else {
-                const apiResponseBody = apiResponse.body;
-                console.error(apiResponseBody.errorMessage);
-            }
-        } else {
-            console.error("connectionError");
-            console.log(response)
-        }
-    };
-
     const sendMessage = async (motionData: Results) => {
         if (dataStream == null || myVRM == null) { return }
         const data: motionData = await { "user": myVRM.user.id, "motion": motionData };
@@ -117,8 +89,8 @@ export default function RoomComponent() {
 
         // トラッキング後のコールバック関数
         const onResults = (results: Results) => {
-            if (videoElement == null || myVRM == null) { return };
-            sendMessage(results)
+            if (videoElement == null || myVRM == null) { return }; //自分のVRMモデルがロード済みなら
+            sendMessage(results) //モーションデータを送信
             animateVRM(myVRM.vrm, results, videoElement); //VRMモデルを動かす
         };
 
@@ -151,6 +123,7 @@ export default function RoomComponent() {
         camera.start();
     }, [cameraRef, myVRM])
 
+    //publicationを購読して他ユーザーから送信されたモーションデータをモデルに反映する
     const subscribeAndAttach = async (publication: RoomPublication, me: LocalP2PRoomMember) => {
         //自分のメッセージを除外する
         if (me == null || publication.publisher.id === me.id) return;
@@ -171,7 +144,7 @@ export default function RoomComponent() {
     };
 
     //ルーム参加時の処理
-    const joinRoom = useCallback(async () => {
+    const CreateRoom = useCallback(async () => {
         //VRMモデルの読み込み
         let myVRMModel: VRM = await VRMLoader("School-girl-sample.vrm")
 
@@ -190,16 +163,13 @@ export default function RoomComponent() {
         const context = await SkyWayContext.Create(token);
 
         //roomの作成
-        const room = await SkyWayRoom.FindOrCreate(context, {
+        const room = await SkyWayRoom.Create(context, {
             type: "p2p",
-            name: "hogefuga",
+            name: v4(), //ルーム名をuuidで自動生成
         });
 
-        //同時接続数を最大3名までに設定
-        if (room.members.length >= 3) {
-            console.log("人数が上限に達しています");
-            return;
-        }
+        //ルーム共有リンクの作成
+        setShereLink(`http://localhost:3000/joinRoom?id=${room.name}`)
 
         //入室
         let me = await room.join({ metadata: "hogefuga" }); //メタデータになにかしらの情報を付与する
@@ -238,8 +208,13 @@ export default function RoomComponent() {
 
         //publicationsの追加時に実行
         room.onStreamPublished.add((e) => subscribeAndAttach(e.publication, me));
-
     }, [scene, dataStream, myVRM, otherVRMData])
+
+    //Sceneの作成後にルームを作成する
+    useEffect(() => {
+        if (scene == null) { return }
+        CreateRoom();
+    }, [scene])
 
     //myVRMの更新時に姿勢推定を開始
     useEffect(() => {
@@ -249,8 +224,7 @@ export default function RoomComponent() {
 
     return (
         <div>
-            <button className="btn" onClick={joinRoom}>join</button>
-            {myVRM?.user.id ? myVRM.user.id : ""}
+            {shereLink ? shereLink : ""}
             <div>
                 <video className="hidden" width="1280px" height="720px" ref={cameraRef}></video>
                 <canvas ref={canvasRef} className="w-full h-full"></canvas>

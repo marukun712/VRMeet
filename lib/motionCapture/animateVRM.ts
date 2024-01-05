@@ -1,6 +1,7 @@
 import * as Kalidokit from "kalidokit";
 import { VRM } from '@pixiv/three-vrm'
 import { rigRotation, rigFace, rigPosition } from './rig';
+import { Results } from "@mediapipe/holistic";
 
 /* VRM Character Animator */
 export const animateVRM = (vrm: VRM, results: any, videoElement: HTMLVideoElement) => { //TODO 型エラーの解消
