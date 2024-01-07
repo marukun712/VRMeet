@@ -1,3 +1,4 @@
+"use client"
 import {
     LocalP2PRoomMember,
     RoomPublication,
@@ -16,16 +17,47 @@ import { Camera } from '@mediapipe/camera_utils';
 import { animateVRM } from "@/lib/motionCapture/animateVRM";
 import { getToken } from "@/lib/skyway/getToken";
 import { motionData, userAndVRMData } from "@/types";
+import { Session, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useSearchParams } from "next/navigation";
 
-type Props = {
-    roomID: string
-}
+export default function JoinRoomDynamicComponent({ session }: { session: Session | null }): JSX.Element {
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id"); //ルームIDの取得
 
-export default function JoinRoomDynamicComponent(props: Props) {
     const [scene, setScene] = useState<THREE.Scene>();
     const [myVRM, setMyVRM] = useState<userAndVRMData>();
     const [dataStream, setDataStream] = useState<LocalDataStream>();
     const otherVRMData: userAndVRMData[] = []
+
+    const supabase = createClientComponentClient()
+    const [username, setUsername] = useState<string | null>(null)
+    const [modelURL, setModelURL] = useState<string | null>(null)
+    const user = session?.user
+
+    const getProfile = useCallback(async () => {
+        try {
+            let { data, error, status } = await supabase
+                .from('profiles')
+                .select(`username, model_url`)
+                .eq('id', user?.id)
+                .single()
+
+            if (error && status !== 406) {
+                throw error
+            }
+
+            if (data) {
+                setUsername(data.username)
+                setModelURL(data.model_url)
+            }
+        } catch (error) {
+            alert('Error loading user data!')
+        }
+    }, [user, supabase])
+
+    useEffect(() => {
+        getProfile()
+    }, [user, getProfile])
 
     const cameraRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -146,10 +178,31 @@ export default function JoinRoomDynamicComponent(props: Props) {
         }
     };
 
+    const getModelURLFromID = async (id: string) => {
+        try {
+            let { data, error, status } = await supabase
+                .from('profiles')
+                .select(`model_url`)
+                .eq('id', id)
+                .single()
+
+            if (error && status !== 406) {
+                console.log(error)
+            }
+
+            if (data) {
+                return data.model_url
+            }
+        } catch (error) {
+            alert('Error loading user data!')
+        }
+    }
+
     //ルーム参加時の処理
     const joinRoom = useCallback(async () => {
+        if (!modelURL) { return }
         //VRMモデルの読み込み
-        let myVRMModel: VRM = await VRMLoader("School-girl-sample.vrm")
+        let myVRMModel: VRM = await VRMLoader(modelURL)
 
         //シーンに追加
         if (scene == null) { return; }
@@ -162,12 +215,12 @@ export default function JoinRoomDynamicComponent(props: Props) {
         const dataStream = await SkyWayStreamFactory.createDataStream();
         setDataStream(dataStream)
 
-        if (token == null || dataStream == null || props.roomID == null) return;
+        if (token == null || dataStream == null || id == null) return;
         const context = await SkyWayContext.Create(token);
 
         //roomの取得
         const room = await SkyWayRoom.Find(context, {
-            name: props.roomID,
+            name: id,
         }, "p2p");
 
         //同時接続数を最大3名までに設定
@@ -177,7 +230,7 @@ export default function JoinRoomDynamicComponent(props: Props) {
         }
 
         //入室
-        let me = await room.join({ metadata: "hogefuga" }); //メタデータになにかしらの情報を付与する
+        let me = await room.join({ metadata: user?.id }); //メタデータになにかしらの情報を付与する
         let myVRM: userAndVRMData = { user: me, vrm: myVRMModel }
         setMyVRM(myVRM)
 
@@ -187,8 +240,11 @@ export default function JoinRoomDynamicComponent(props: Props) {
         //既に参加しているメンバーのモデルをロード
         room.members.forEach(async (e) => {
             if (e.state == "joined" && e.id !== myVRM.user.id) {
+                if (e.metadata == null) { return }
+                let url = await getModelURLFromID(e.metadata)
+                if (!url) { return };
                 //VRMモデルの読み込み
-                let otherVRMModel: VRM = await VRMLoader("sample.vrm")
+                let otherVRMModel: VRM = await VRMLoader(url)
                 scene.add(otherVRMModel.scene);
                 otherVRMModel.scene.rotation.y = Math.PI;
 
@@ -199,8 +255,12 @@ export default function JoinRoomDynamicComponent(props: Props) {
 
         //メンバーの参加時にモデルをロード
         room.onMemberJoined.add(async (e) => {
+            if (e.member.metadata == null) { return }
+            let url = await getModelURLFromID(e.member.metadata)
+
+            if (!url) { return };
             //VRMモデルの読み込み
-            let otherVRMModel: VRM = await VRMLoader("sample.vrm")
+            let otherVRMModel: VRM = await VRMLoader(url)
             scene.add(otherVRMModel.scene);
             otherVRMModel.scene.rotation.y = Math.PI;
 
@@ -217,9 +277,9 @@ export default function JoinRoomDynamicComponent(props: Props) {
 
     //Sceneの作成後にルームに参加
     useEffect(() => {
-        if (scene == null) { return }
+        if (scene == null && modelURL == null) { return }
         joinRoom();
-    }, [scene])
+    }, [scene, modelURL])
 
     //myVRMの更新時に姿勢推定を開始
     useEffect(() => {

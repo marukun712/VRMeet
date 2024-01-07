@@ -1,3 +1,4 @@
+"use client"
 import {
     LocalP2PRoomMember,
     RoomPublication,
@@ -17,13 +18,44 @@ import { Camera } from '@mediapipe/camera_utils';
 import { animateVRM } from "@/lib/motionCapture/animateVRM";
 import { getToken } from "@/lib/skyway/getToken";
 import { motionData, userAndVRMData } from "@/types";
+import { Session, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-export default function CreateRoomDynamicComponent() {
+export default function CreateRoomDynamicComponent({ session }: { session: Session | null }): JSX.Element {
     const [scene, setScene] = useState<THREE.Scene>();
     const [myVRM, setMyVRM] = useState<userAndVRMData>();
     const [shereLink, setShereLink] = useState<string>();
     const [dataStream, setDataStream] = useState<LocalDataStream>();
     const otherVRMData: userAndVRMData[] = []
+
+    const supabase = createClientComponentClient()
+    const [username, setUsername] = useState<string | null>(null)
+    const [modelURL, setModelURL] = useState<string | null>(null)
+    const user = session?.user
+
+    const getProfile = useCallback(async () => {
+        try {
+            let { data, error, status } = await supabase
+                .from('profiles')
+                .select(`username, model_url`)
+                .eq('id', user?.id)
+                .single()
+
+            if (error && status !== 406) {
+                throw error
+            }
+
+            if (data) {
+                setUsername(data.username)
+                setModelURL(data.model_url)
+            }
+        } catch (error) {
+            alert('Error loading user data!')
+        }
+    }, [user, supabase])
+
+    useEffect(() => {
+        getProfile()
+    }, [user, getProfile])
 
     const cameraRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -143,10 +175,31 @@ export default function CreateRoomDynamicComponent() {
         }
     };
 
+    const getModelURLFromID = async (id: string) => {
+        try {
+            let { data, error, status } = await supabase
+                .from('profiles')
+                .select(`model_url`)
+                .eq('id', id)
+                .single()
+
+            if (error && status !== 406) {
+                console.log(error)
+            }
+
+            if (data) {
+                return data.model_url
+            }
+        } catch (error) {
+            alert('Error loading user data!')
+        }
+    }
+
     //ルーム参加時の処理
     const CreateRoom = useCallback(async () => {
+        if (!modelURL) { return }
         //VRMモデルの読み込み
-        let myVRMModel: VRM = await VRMLoader("School-girl-sample.vrm")
+        let myVRMModel: VRM = await VRMLoader(modelURL)
 
         //シーンに追加
         if (scene == null) { return; }
@@ -172,7 +225,7 @@ export default function CreateRoomDynamicComponent() {
         setShereLink(`http://localhost:3000/joinRoom?id=${room.name}`)
 
         //入室
-        let me = await room.join({ metadata: "hogefuga" }); //メタデータになにかしらの情報を付与する
+        let me = await room.join({ metadata: user?.id }); //メタデータになにかしらの情報を付与する
         let myVRM: userAndVRMData = { user: me, vrm: myVRMModel }
         setMyVRM(myVRM)
 
@@ -182,8 +235,11 @@ export default function CreateRoomDynamicComponent() {
         //既に参加しているメンバーのモデルをロード
         room.members.forEach(async (e) => {
             if (e.state == "joined" && e.id !== myVRM.user.id) {
+                if (e.metadata == null) { return }
+                let url = await getModelURLFromID(e.metadata)
+                if (!url) { return };
                 //VRMモデルの読み込み
-                let otherVRMModel: VRM = await VRMLoader("sample.vrm")
+                let otherVRMModel: VRM = await VRMLoader(url)
                 scene.add(otherVRMModel.scene);
                 otherVRMModel.scene.rotation.y = Math.PI;
 
@@ -194,8 +250,12 @@ export default function CreateRoomDynamicComponent() {
 
         //メンバーの参加時にモデルをロード
         room.onMemberJoined.add(async (e) => {
+            if (e.member.metadata == null) { return }
+            let url = await getModelURLFromID(e.member.metadata)
+
+            if (!url) { return };
             //VRMモデルの読み込み
-            let otherVRMModel: VRM = await VRMLoader("sample.vrm")
+            let otherVRMModel: VRM = await VRMLoader(url)
             scene.add(otherVRMModel.scene);
             otherVRMModel.scene.rotation.y = Math.PI;
 
@@ -208,13 +268,12 @@ export default function CreateRoomDynamicComponent() {
 
         //publicationsの追加時に実行
         room.onStreamPublished.add((e) => subscribeAndAttach(e.publication, me));
-    }, [scene, dataStream, myVRM, otherVRMData])
+    }, [scene, dataStream, myVRM, otherVRMData, modelURL])
 
-    //Sceneの作成後にルームを作成する
     useEffect(() => {
-        if (scene == null) { return }
+        if (scene == null && modelURL == null) { return }
         CreateRoom();
-    }, [scene])
+    }, [scene, modelURL])
 
     //myVRMの更新時に姿勢推定を開始
     useEffect(() => {

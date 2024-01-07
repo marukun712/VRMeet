@@ -1,17 +1,17 @@
-"use client"
 import dynamic from "next/dynamic";
-import { useSearchParams } from "next/navigation";
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 
-export default function JoinRoom(): JSX.Element {
+export default async function JoinRoom() {
     //error ReferenceError: RTCPeerConnection is not defined回避のためにDynamicComponentとしてimport
     let DynamicComponent = dynamic(() => import("./RoomComponent"), {
         ssr: false,
     });
+    const supabase = createServerComponentClient({ cookies })
 
-    const searchParams = useSearchParams();
-    const id = searchParams.get("id");
+    const {
+        data: { session },
+    } = await supabase.auth.getSession()
 
-    if (id) return <DynamicComponent roomID={id} />
-
-    return <>ルームIDを指定してください。</>
+    return <DynamicComponent session={session} />
 }

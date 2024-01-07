@@ -1,8 +1,8 @@
-export default function Header() {
+export default function Header(): JSX.Element {
     return (
-        <div className="navbar bg-yellow-300">
+        <div className="navbar">
             <div className="flex-1">
-                <a className="btn btn-ghost text-xl">daisyUI</a>
+                <a className="btn btn-ghost text-xl">VRMeet</a>
             </div>
             <div className="flex-none gap-2">
                 <div className="form-control">
