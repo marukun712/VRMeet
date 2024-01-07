@@ -1,48 +1,16 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
 import { Session, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { ChangeEvent } from 'react'
 import LoadingModal from '@/components/LoadingModal'
+import UserIcon from './UserIcon'
+import SignOutForm from './SignOutForm'
+import { useUser } from '@/hooks/useUser'
 
 export default function Dashboard({ session }: { session: Session | null }) {
-    const supabase = createClientComponentClient()
-    const [loading, setLoading] = useState(true)
-    const [fullname, setFullname] = useState<string | null>(null)
-    const [username, setUsername] = useState<string | null>(null)
-    const [avatarURL, setAvatarUrl] = useState<string | null>(null)
-    const [modelURL, setModelURL] = useState<string | null>(null)
-    const user = session?.user
+    const supabase = createClientComponentClient();
 
-    const getProfile = useCallback(async () => {
-        try {
-            setLoading(true)
-
-            let { data, error, status } = await supabase
-                .from('profiles')
-                .select(`full_name, username, avatar_url,model_url`)
-                .eq('id', user?.id)
-                .single()
-
-            if (error && status !== 406) {
-                throw error
-            }
-
-            if (data) {
-                setFullname(data.full_name)
-                setUsername(data.username)
-                setAvatarUrl(data.avatar_url)
-                setModelURL(data.model_url)
-            }
-        } catch (error) {
-            alert('Error loading user data!')
-        } finally {
-            setLoading(false)
-        }
-    }, [user, supabase])
-
-    useEffect(() => {
-        getProfile()
-    }, [user, getProfile])
+    if (!session) { return }
+    const { loading, setLoading, fullname, username, setModelURL, avatarURL, user } = useUser(session); //ユーザーデータの取得
 
     async function updateProfile({
         username,
@@ -81,7 +49,11 @@ export default function Dashboard({ session }: { session: Session | null }) {
             })
 
         if (error) {
-            console.error(error)
+            alert("アバターのアップロードに失敗しました。")
+        }
+
+        if (data) {
+            alert("アバターのアップロードに成功しました!")
         }
     }
 
@@ -100,35 +72,41 @@ export default function Dashboard({ session }: { session: Session | null }) {
         }
 
         const file = event.target.files[0]
-        uploadModel(file)
 
         let model_url = await getFileURL(`${user?.id}/${file.name}`)
+        uploadModel(file)
+
         setModelURL(model_url)
         updateProfile({ username, model_url });
     }
 
     return (
-        <div className="form-widget">
-            {loading ? <LoadingModal /> : ""}
-            <h1 className='text-2xl py-10 text-center'>{username}さん、ようこそ。</h1>
-            <div className="avatar justify-center flex">
-                <div className="w-24 rounded-full">
-                    {avatarURL ? <img src={avatarURL} width={500} height={500} /> : ""}
+        <div className="drawer lg:drawer-open">
+            <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
+            <div className="drawer-content flex flex-col items-center justify-center">
+                <label htmlFor="my-drawer-2" className="btn btn-primary drawer-button lg:hidden">Open SideBar</label>
+
+                {loading ? <LoadingModal /> : ""}
+                <div className='flex'>
+                    <div>
+                        {fullname && avatarURL ? <UserIcon username={fullname} avatarURL={avatarURL} /> : ""}
+                        <div className='py-10'>
+                            <h1 className='text-2xl'>アバターを設定</h1>
+                            <p>あなたがアプリ内で使いたいVRMモデルをアップロードしてください。</p>
+                            <input type="file" className="file-input w-full max-w-xs my-6" onChange={handleVRMChange} />
+                        </div>
+                        <SignOutForm />
+                    </div>
                 </div>
+
             </div>
 
-            <div>
-                <h1>アバターを設定</h1>
-                <p>あなたがアプリ内で使いたいVRMモデルをアップロードしてください。</p>
-                <input type="file" className="file-input w-full max-w-xs" onChange={handleVRMChange} />
-            </div>
-
-            <div>
-                <form action="/auth/signout" method="post">
-                    <button className="btn" type="submit">
-                        Sign out
-                    </button>
-                </form>
+            <div className="drawer-side">
+                <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
+                <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
+                    <li><a>Sidebar Item 1</a></li>
+                    <li><a>ユーザー情報の編集</a></li>
+                </ul>
             </div>
         </div>
     )
