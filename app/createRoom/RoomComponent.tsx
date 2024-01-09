@@ -11,15 +11,15 @@ import {
 import { v4 } from "uuid"
 import { useEffect, useState, useCallback, useRef } from "react";
 import { VRM } from '@pixiv/three-vrm'
-import { VRMLoader } from '@/lib/motionCapture/VRMLoader';
-import { animateVRM } from "@/lib/motionCapture/animateVRM";
-import { getToken } from "@/lib/skyway/getToken";
+import { VRMLoader } from '@/utils/motionCapture/VRMLoader';
+import { animateVRM } from "@/utils/motionCapture/animateVRM";
+import { getToken } from "@/utils/skyway/getToken";
 import { userAndVRMData } from "@/types";
 import { Session } from '@supabase/auth-helpers-nextjs'
 import { useThreeJS } from "@/hooks/useThreeJS";
 import { useUser } from "@/hooks/useUser";
-import { fetchModelURLFromID } from "@/lib/supabase/fetchModelFromID";
-import { startMediaPipeTracking } from "@/lib/motionCapture/startMediaPipeTracking";
+import { fetchModelURLFromID } from "@/utils/supabase/fetchModelFromID";
+import { startMediaPipeTracking } from "@/utils/motionCapture/startMediaPipeTracking";
 
 export default function CreateRoomDynamicComponent({ session }: { session: Session | null }) {
     if (!session) {

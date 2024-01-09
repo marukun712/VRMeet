@@ -10,16 +10,16 @@ import {
 } from "@skyway-sdk/room";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { VRM } from '@pixiv/three-vrm'
-import { VRMLoader } from '@/lib/motionCapture/VRMLoader';
-import { animateVRM } from "@/lib/motionCapture/animateVRM";
-import { getToken } from "@/lib/skyway/getToken";
+import { VRMLoader } from '@/utils/motionCapture/VRMLoader';
+import { animateVRM } from "@/utils/motionCapture/animateVRM";
+import { getToken } from "@/utils/skyway/getToken";
 import { userAndVRMData } from "@/types";
 import { Session } from '@supabase/auth-helpers-nextjs'
 import { useSearchParams } from "next/navigation";
-import { fetchModelURLFromID } from "@/lib/supabase/fetchModelFromID";
+import { fetchModelURLFromID } from "@/utils/supabase/fetchModelFromID";
 import { useUser } from "@/hooks/useUser";
 import { useThreeJS } from "@/hooks/useThreeJS";
-import { startMediaPipeTracking } from "@/lib/motionCapture/startMediaPipeTracking";
+import { startMediaPipeTracking } from "@/utils/motionCapture/startMediaPipeTracking";
 
 export default function JoinRoomDynamicComponent({ session }: { session: Session | null }) {
     const searchParams = useSearchParams();

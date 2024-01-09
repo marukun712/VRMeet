@@ -2,7 +2,7 @@ import { RefObject } from "react"
 import { Results } from "@mediapipe/holistic"
 import { LocalDataStream } from "@skyway-sdk/room"
 import { userAndVRMData, motionData } from "@/types"
-import { animateVRM } from "@/lib/motionCapture/animateVRM"
+import { animateVRM } from "@/utils/motionCapture/animateVRM"
 import { Holistic } from "@mediapipe/holistic"
 import { Camera } from "@mediapipe/camera_utils"
 
