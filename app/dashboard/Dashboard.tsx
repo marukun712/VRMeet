@@ -10,6 +10,8 @@ import Modal from '@/components/Modal'
 import { v4 } from 'uuid'
 import { useModel } from '@/hooks/useModel'
 import ModelDetails from './ModelDetails'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Dashboard({ session }: { session: Session | null }) {
     const supabase = createClientComponentClient();
@@ -17,6 +19,8 @@ export default function Dashboard({ session }: { session: Session | null }) {
     if (!session) { return }
     const { loading, setLoading, fullname, setFullname, username, setUsername, modelURL, setModelURL, avatarURL, user } = useUser(session); //ユーザーデータの取得
     const { myModels } = useModel(user.id);
+    const [roomID, setRoomID] = useState("");
+    const router = useRouter()
 
     //ユーザーネームの更新
     const updateProfile = async ({
@@ -163,6 +167,17 @@ export default function Dashboard({ session }: { session: Session | null }) {
                 <div className='flex py-5'>
                     <div>
                         {fullname && avatarURL ? <UserIcon username={fullname} avatarURL={avatarURL} /> : ""}
+
+                        <div className='flex'>
+                            <input
+                                type="text"
+                                value={roomID || ''}
+                                placeholder='ルームIDを入力して参加...'
+                                className='input input-bordered input-primary w-full max-w-xs m-2'
+                                onChange={(e) => setRoomID(e.target.value)}
+                            />
+                            <button className="btn btn-primary m-auto" onClick={() => router.push(`http://localhost:3000/joinRoom?id=${roomID}`)}>ルームに参加</button>
+                        </div>
 
                         <Modal id="model_setting">
                             <h1 className='text-2xl'>モデル設定</h1>

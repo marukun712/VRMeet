@@ -8,7 +8,7 @@ import {
     SkyWayStreamFactory,
     RoomMember
 } from "@skyway-sdk/room";
-import { useEffect, useState, useCallback, useRef, use } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { VRM } from '@pixiv/three-vrm'
 import { VRMLoader } from '@/utils/motionCapture/VRMLoader';
 import { animateVRM } from "@/utils/motionCapture/animateVRM";
@@ -127,6 +127,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
             name: id,
         }, "p2p");
 
+
         //同時接続数を最大3名までに設定
         if (room.members.length >= 3) {
             console.log("人数が上限に達しています");
@@ -184,7 +185,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
             {loading ? <LoadingModal message='ルームに参加中です。タブがフリーズすることがありますが、数秒で改善しますのでそのままお待ちください。' /> : ""}
 
             {/* ログの表示 */}
-            <div className="absolute bottom-14 right-14 w-96 h-64 overflow-scroll">
+            <div className="absolute bottom-14 right-14 w-96 h-64 overflow-scroll hidden md:block">
                 {log.map((log: string) => {
                     return (
                         <h1>{log}</h1>

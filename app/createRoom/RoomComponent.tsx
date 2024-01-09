@@ -180,7 +180,7 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
             {loading ? <LoadingModal message='ルームに参加中です。タブがフリーズすることがありますが、数秒で改善しますのでそのままお待ちください。' /> : ""}
 
             {/* ログの表示 */}
-            <div className="absolute bottom-14 right-14 w-96 h-64 overflow-scroll">
+            <div className="absolute bottom-14 right-14 w-96 h-64 overflow-scroll hidden md:block">
                 {log.map((log: string) => {
                     return (
                         <h1>{log}</h1>

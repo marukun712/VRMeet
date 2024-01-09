@@ -5,6 +5,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function AuthForm() {
     const supabase = createClientComponentClient()
+    const redirectURL = `http://localhost:3000/auth/callback`
 
     return (
         <SocialAuth
@@ -12,7 +13,7 @@ export default function AuthForm() {
             appearance={{ theme: ThemeSupa }}
             theme="dark"
             providers={["google"]}
-            redirectTo="http://localhost:3000/auth/callback"
+            redirectTo={redirectURL}
         />
     )
 }

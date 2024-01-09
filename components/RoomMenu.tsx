@@ -64,7 +64,6 @@ export default function RoomMenu(props: Props) {
             </div>
 
             <label className="swap absolute top-5 right-5">
-                {/* this hidden checkbox controls the state */}
                 <input type="checkbox" onChange={() => setIsShowMenu(!isShowMenu)} />
 
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 swap-on fill-current">
