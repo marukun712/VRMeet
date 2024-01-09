@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useCallback } from "react";
 
 export const useModel = (userId: string) => {
     const supabase = createClientComponentClient();
 
     const [myModels, setMyModels] = useState<{ url: string, name: string, id: string }[]>([]);
 
-    const getModel = async () => {
+    const getModel = useCallback(async () => {
         const { data, error } = await supabase
             .from('models')
             .select('id,url,name')
@@ -20,7 +21,7 @@ export const useModel = (userId: string) => {
             console.error(error)
             alert("モデルデータの取得に失敗しました!")
         }
-    }
+    }, [supabase])
 
     useEffect(() => {
         getModel();

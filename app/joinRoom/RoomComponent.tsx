@@ -8,7 +8,7 @@ import {
     SkyWayStreamFactory,
     RoomMember
 } from "@skyway-sdk/room";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, use } from "react";
 import { VRM } from '@pixiv/three-vrm'
 import { VRMLoader } from '@/utils/motionCapture/VRMLoader';
 import { animateVRM } from "@/utils/motionCapture/animateVRM";
@@ -21,17 +21,24 @@ import { useUser } from "@/hooks/useUser";
 import { useThreeJS } from "@/hooks/useThreeJS";
 import { startMediaPipeTracking } from "@/utils/motionCapture/startMediaPipeTracking";
 import RoomMenu from "@/components/RoomMenu";
+import { useRouter } from 'next/navigation'
+import { fetchUserNameFromID } from "@/utils/supabase/fetchUserNameFromID";
+import LoadingModal from "@/components/LoadingModal";
 
 export default function JoinRoomDynamicComponent({ session }: { session: Session | null }) {
+    const router = useRouter()
     const searchParams = useSearchParams();
     const id = searchParams.get("id"); //ルームIDの取得
 
     if (!session) {
         alert("先にログインしてください！")
-        return
+        router.push("/")
+        return;
     }
 
+    const [loading, setIsLoading] = useState(true)
     const [myVRM, setMyVRM] = useState<userAndVRMData>();
+    const [log, setLog] = useState<string[]>([]);
     const [dataStream, setDataStream] = useState<LocalDataStream>();
     let otherVRMData: userAndVRMData[] = []
 
@@ -39,6 +46,10 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
     const cameraRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const { scene } = useThreeJS(canvasRef); //ThreeJS Sceneの作成
+
+    const finishLoading = useCallback(() => {
+        setIsLoading(false)
+    }, [loading])
 
     //publicationを購読して他ユーザーから送信されたモーションデータをモデルに反映する
     const subscribeAndAttach = async (publication: RoomPublication, me: LocalP2PRoomMember) => {
@@ -60,10 +71,14 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
         }
     };
 
+    //リモートユーザーのモデルをシーンに追加する
     const addRemoteUserModel = async (user: RoomMember) => {
-        if (user.metadata == null || scene == null) { return }
+        if (user.metadata == null || scene == null) { alert("ユーザーデータの取得に失敗しました。"); return; }
+        let userName = await fetchUserNameFromID(user.metadata)
+        setLog((pre) => [...pre, `${userName}さんが参加しました。`])
+
         let url = await fetchModelURLFromID(user.metadata)
-        if (!url) { return };
+        if (!url) { alert("リモートユーザーのモデル取得に失敗しました。再度ルームを建て直してください。") };
         //VRMモデルの読み込み
         let otherVRMModel: VRM = await VRMLoader(url)
         scene.add(otherVRMModel.scene);
@@ -73,8 +88,11 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
         otherVRMData.push(remoteMemberVRM)
     }
 
+    //リモートユーザー退出時にシーンからモデルを削除する
     const removeRemoteUserModel = async (user: RoomMember) => {
-        if (user.metadata == null || scene == null) { return }
+        if (user.metadata == null || scene == null) { alert("ユーザーデータの取得に失敗しました。"); return; }
+        let userName = await fetchUserNameFromID(user.metadata)
+        setLog((pre) => [...pre, `${userName}さんが退出しました。`])
 
         let target = otherVRMData.find((e) => e.user.id == user.id) //VRMデータの中から退出ユーザーのモデルを探す
 
@@ -90,7 +108,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
         let myVRMModel: VRM = await VRMLoader(modelURL)
 
         //シーンに追加
-        if (scene == null) { return; }
+        if (scene == null) { alert("シーンが作成されていません。ページをリロードしてください。"); return; }
         scene.add(myVRMModel.scene);
 
         myVRMModel.scene.rotation.y = Math.PI; // モデルが正面を向くように180度回転させる
@@ -119,6 +137,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
         let me = await room.join({ metadata: user?.id }); //メタデータにSupabaseのユーザーIDを付与する
         let myVRM: userAndVRMData = { user: me, vrm: myVRMModel }
         setMyVRM(myVRM)
+        setLog((pre) => [...pre, `ルームID${room.name}でルームに参加しました。`])
 
         //dataStreamをpublishする
         await me.publish(dataStream);
@@ -156,12 +175,22 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
     //myVRMの更新時に姿勢推定を開始
     useEffect(() => {
         if (myVRM == null || dataStream == null) { return }
-        startMediaPipeTracking(cameraRef, dataStream, myVRM);
+        startMediaPipeTracking(cameraRef, dataStream, myVRM, finishLoading);
     }, [myVRM])
 
     return (
         <div>
             {id && scene && myVRM ? <RoomMenu roomID={id} roomURL={`http://localhost:3000/joinRoom?id=${id}`} scene={scene} me={myVRM.user} /> : ""}
+            {loading ? <LoadingModal message='ルームに参加中です。タブがフリーズすることがありますが、数秒で改善しますのでそのままお待ちください。' /> : ""}
+
+            {/* ログの表示 */}
+            <div className="absolute bottom-14 right-14 w-96 h-64 overflow-scroll">
+                {log.map((log: string) => {
+                    return (
+                        <h1>{log}</h1>
+                    )
+                })}
+            </div>
             <div>
                 <video className="hidden" width="1280px" height="720px" ref={cameraRef}></video>
                 <canvas ref={canvasRef} className="w-full h-full"></canvas>

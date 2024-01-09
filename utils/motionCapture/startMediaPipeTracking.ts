@@ -6,7 +6,9 @@ import { animateVRM } from "@/utils/motionCapture/animateVRM"
 import { Holistic } from "@mediapipe/holistic"
 import { Camera } from "@mediapipe/camera_utils"
 
-export const startMediaPipeTracking = async (cameraRef: RefObject<HTMLVideoElement>, dataStream: LocalDataStream, myVRM: userAndVRMData) => {
+export const startMediaPipeTracking = async (cameraRef: RefObject<HTMLVideoElement>, dataStream: LocalDataStream, myVRM: userAndVRMData, finishLoading: () => void) => {
+    let loading = true;
+
     const sendMessage = async (motionData: Results) => {
         if (dataStream == null || myVRM == null) { return }
         const data: motionData = await { "user": myVRM.user.id, "motion": motionData };
@@ -22,6 +24,7 @@ export const startMediaPipeTracking = async (cameraRef: RefObject<HTMLVideoEleme
     // トラッキング後のコールバック関数
     const onResults = (results: Results) => {
         if (videoElement == null || myVRM == null) { return }; //自分のVRMモデルがロード済みなら
+        if (loading) { finishLoading() }
         sendMessage(results) //モーションデータを送信
         animateVRM(myVRM.vrm, results, videoElement); //VRMモデルを動かす
     };

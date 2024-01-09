@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import * as Kalidokit from "kalidokit";
 import { VRM, VRMSchema } from '@pixiv/three-vrm'
+
 //Import Helper Functions from Kalidokit
 const clamp = Kalidokit.Utils.clamp;
 const lerp = Kalidokit.Vector.lerp;
@@ -10,7 +11,7 @@ export const rigRotation = (name: string, rotation: any = { x: 0, y: 0, z: 0 }, 
     if (!currentVrm || currentVrm.humanoid == null) {
         return;
     }
-    const Part = currentVrm.humanoid.getBoneNode(VRMSchema.HumanoidBoneName[name]);
+    const Part = currentVrm.humanoid.getBoneNode(VRMSchema.HumanoidBoneName[name as keyof typeof VRMSchema.HumanoidBoneName]);
     if (!Part) {
         return;
     }
@@ -30,7 +31,7 @@ export const rigPosition = (name: string, position = { x: 0, y: 0, z: 0 }, dampe
     if (!currentVrm || currentVrm.humanoid == null) {
         return;
     }
-    const Part = currentVrm.humanoid.getBoneNode(VRMSchema.HumanoidBoneName[name]);
+    const Part = currentVrm.humanoid.getBoneNode(VRMSchema.HumanoidBoneName[name as keyof typeof VRMSchema.HumanoidBoneName]);
     if (!Part) {
         return;
     }
@@ -40,8 +41,8 @@ export const rigPosition = (name: string, position = { x: 0, y: 0, z: 0 }, dampe
 
 // Animate Face Helper Function
 let oldLookTarget = new THREE.Euler();
-export const rigFace = (riggedFace: any, currentVrm: VRM) => {
-    if (!currentVrm) {
+export const rigFace = (riggedFace: Kalidokit.TFace | undefined, currentVrm: VRM) => {
+    if (!currentVrm || !riggedFace) {
         return;
     }
     rigRotation("Neck", riggedFace.head, 0.7, 0.3, currentVrm);
@@ -49,7 +50,7 @@ export const rigFace = (riggedFace: any, currentVrm: VRM) => {
     // Blendshapes and Preset Name Schema
     const Blendshape: any = currentVrm.blendShapeProxy;
     const PresetName = VRMSchema.BlendShapePresetName;
-    if (Blendshape == undefined || currentVrm.lookAt == undefined || currentVrm.lookAt.applyer == undefined) { return };
+    if (currentVrm.lookAt == undefined || currentVrm.lookAt.applyer == undefined) { return };
 
     // Simple example without winking. Interpolate based on old blendshape, then stabilize blink with `Kalidokit` helper function.
     // for VRM, 1 is closed, 0 is open.

@@ -1,7 +1,6 @@
 import * as Kalidokit from "kalidokit";
 import { VRM } from '@pixiv/three-vrm'
 import { rigRotation, rigFace, rigPosition } from './rig';
-import { Results } from "@mediapipe/holistic";
 
 /* VRM Character Animator */
 export const animateVRM = (vrm: VRM, results: any, videoElement: HTMLVideoElement) => { //TODO 型エラーの解消
@@ -9,7 +8,7 @@ export const animateVRM = (vrm: VRM, results: any, videoElement: HTMLVideoElemen
         return;
     }
     // Take the results from `Holistic` and animate character based on its Face, Pose, and Hand Keypoints.
-    let riggedPose: Kalidokit.TPose | undefined, riggedLeftHand: any, riggedRightHand: any, riggedFace;
+    let riggedPose: Kalidokit.TPose | undefined, riggedLeftHand: Kalidokit.THand<Kalidokit.Side> | undefined, riggedRightHand: Kalidokit.THand<Kalidokit.Side> | undefined, riggedFace;
 
     const faceLandmarks = results.faceLandmarks;
     // Pose 3D Landmarks are with respect to Hip distance in meters
@@ -71,6 +70,7 @@ export const animateVRM = (vrm: VRM, results: any, videoElement: HTMLVideoElemen
     // Animate Hands
     if (leftHandLandmarks && riggedPose !== undefined) {
         riggedLeftHand = Kalidokit.Hand.solve(leftHandLandmarks, "Left");
+        if (!riggedLeftHand) { return; }
         rigRotation("LeftHand", {
             // Combine pose rotation Z and hand rotation X Y
             z: riggedPose.LeftHand.z,
@@ -95,6 +95,7 @@ export const animateVRM = (vrm: VRM, results: any, videoElement: HTMLVideoElemen
     }
     if (rightHandLandmarks && riggedPose !== undefined) {
         riggedRightHand = Kalidokit.Hand.solve(rightHandLandmarks, "Right");
+        if (!riggedRightHand) { return; }
         rigRotation("RightHand", {
             // Combine Z axis from pose hand and X/Y axis from hand wrist rotation
             z: riggedPose.RightHand.z,

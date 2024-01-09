@@ -159,7 +159,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
             </label>
 
             <div className="drawer-content flex flex-col items-center justify-center">
-                {loading ? <LoadingModal /> : ""}
+                {loading ? <LoadingModal message="ユーザーデータを取得中..." /> : ""}
                 <div className='flex py-5'>
                     <div>
                         {fullname && avatarURL ? <UserIcon username={fullname} avatarURL={avatarURL} /> : ""}
