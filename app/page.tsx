@@ -1,6 +1,7 @@
 'use client'
 import Header from "@/components/Header"
 import AuthForm from "@/components/AuthButton"
+import RoomMenu from "@/components/RoomMenu"
 
 export default function Home(): JSX.Element {
     return (

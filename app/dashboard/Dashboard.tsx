@@ -64,6 +64,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
             })
             if (error) { throw error }
             alert('モデルが更新されました!')
+            location.reload();
         } catch (error) {
             alert('モデルの更新にエラーが発生しました。')
         } finally {
@@ -105,6 +106,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
         }
 
         alert("モデルを削除しました。")
+        location.reload();
     }
 
     const getFileURL = async (path: string) => {

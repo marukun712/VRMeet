@@ -20,6 +20,7 @@ import { useThreeJS } from "@/hooks/useThreeJS";
 import { useUser } from "@/hooks/useUser";
 import { fetchModelURLFromID } from "@/utils/supabase/fetchModelFromID";
 import { startMediaPipeTracking } from "@/utils/motionCapture/startMediaPipeTracking";
+import RoomMenu from "@/components/RoomMenu";
 
 export default function CreateRoomDynamicComponent({ session }: { session: Session | null }) {
     if (!session) {
@@ -28,9 +29,9 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
     }
 
     const [myVRM, setMyVRM] = useState<userAndVRMData>();
-    const [shereLink, setShereLink] = useState<string>();
+    const [roomID, setRoomID] = useState<string>();
     const [dataStream, setDataStream] = useState<LocalDataStream>();
-    const otherVRMData: userAndVRMData[] = []
+    let otherVRMData: userAndVRMData[] = []
 
     const { modelURL, user } = useUser(session) //ユーザーデータの取得
     const cameraRef = useRef<HTMLVideoElement | null>(null);
@@ -70,6 +71,16 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
         otherVRMData.push(remoteMemberVRM)
     }
 
+    const removeRemoteUserModel = async (user: RoomMember) => {
+        if (user.metadata == null || scene == null) { return }
+
+        let target = otherVRMData.find((e) => e.user.id == user.id) //VRMデータの中から退出ユーザーのモデルを探す
+
+        if (target == null) { return }
+        scene.remove(target.vrm.scene) //モデルを削除
+        otherVRMData = otherVRMData.filter((e) => e.user.id !== user.id); //配列からユーザーの要素を削除
+    }
+
     //ルーム参加時の処理
     const CreateRoom = useCallback(async () => {
         if (typeof modelURL !== "string") { return }
@@ -98,7 +109,7 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
         });
 
         //ルーム共有リンクの作成
-        setShereLink(`http://localhost:3000/joinRoom?id=${room.name}`)
+        setRoomID(room.name)
 
         //入室
         let me = await room.join({ metadata: user?.id }); //メタデータにSupabaseのユーザーIDを付与する
@@ -118,6 +129,11 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
         //メンバーの参加時にモデルをロード
         room.onMemberJoined.add(async (e) => {
             addRemoteUserModel(e.member)
+        })
+
+        //メンバーの退出時にモデルを削除
+        room.onMemberLeft.add(async (e) => {
+            removeRemoteUserModel(e.member)
         })
 
         //ルームのpublicationsをsubscribeしておく
@@ -140,7 +156,7 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
 
     return (
         <div>
-            {shereLink ? shereLink : ""}
+            {roomID && scene && myVRM ? <RoomMenu roomID={roomID} roomURL={`http://localhost:3000/joinRoom?id=${roomID}`} scene={scene} me={myVRM.user} /> : ""}
             <div>
                 <video className="hidden" width="1280px" height="720px" ref={cameraRef}></video>
                 <canvas ref={canvasRef} className="w-full h-full"></canvas>

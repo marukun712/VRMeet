@@ -20,6 +20,7 @@ import { fetchModelURLFromID } from "@/utils/supabase/fetchModelFromID";
 import { useUser } from "@/hooks/useUser";
 import { useThreeJS } from "@/hooks/useThreeJS";
 import { startMediaPipeTracking } from "@/utils/motionCapture/startMediaPipeTracking";
+import RoomMenu from "@/components/RoomMenu";
 
 export default function JoinRoomDynamicComponent({ session }: { session: Session | null }) {
     const searchParams = useSearchParams();
@@ -32,7 +33,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
 
     const [myVRM, setMyVRM] = useState<userAndVRMData>();
     const [dataStream, setDataStream] = useState<LocalDataStream>();
-    const otherVRMData: userAndVRMData[] = []
+    let otherVRMData: userAndVRMData[] = []
 
     const { modelURL, user } = useUser(session) //ユーザーデータの取得
     const cameraRef = useRef<HTMLVideoElement | null>(null);
@@ -70,6 +71,16 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
 
         let remoteMemberVRM: userAndVRMData = { user: user, vrm: otherVRMModel } //idからモデルを参照できるようにユーザーデータとモデルデータをオブジェクトに格納
         otherVRMData.push(remoteMemberVRM)
+    }
+
+    const removeRemoteUserModel = async (user: RoomMember) => {
+        if (user.metadata == null || scene == null) { return }
+
+        let target = otherVRMData.find((e) => e.user.id == user.id) //VRMデータの中から退出ユーザーのモデルを探す
+
+        if (target == null) { return }
+        scene.remove(target.vrm.scene) //モデルを削除
+        otherVRMData = otherVRMData.filter((e) => e.user.id !== user.id); //配列からユーザーの要素を削除
     }
 
     //ルーム参加時の処理
@@ -124,6 +135,11 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
             addRemoteUserModel(e.member)
         })
 
+        //メンバーの退出時にモデルを削除
+        room.onMemberLeft.add(async (e) => {
+            removeRemoteUserModel(e.member)
+        })
+
         //ルームのpublicationsをsubscribeしておく
         room.publications.forEach((e) => subscribeAndAttach(e, me));
 
@@ -145,7 +161,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
 
     return (
         <div>
-            {myVRM?.user.id ? myVRM.user.id : ""}
+            {id && scene && myVRM ? <RoomMenu roomID={id} roomURL={`http://localhost:3000/joinRoom?id=${id}`} scene={scene} me={myVRM.user} /> : ""}
             <div>
                 <video className="hidden" width="1280px" height="720px" ref={cameraRef}></video>
                 <canvas ref={canvasRef} className="w-full h-full"></canvas>
