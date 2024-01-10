@@ -13,7 +13,7 @@ import { VRM } from '@pixiv/three-vrm'
 import { VRMLoader } from '@/utils/motionCapture/VRMLoader';
 import { animateVRM } from "@/utils/motionCapture/animateVRM";
 import { getToken } from "@/utils/skyway/getToken";
-import { userAndVRMData } from "@/types";
+import { userAndVRMData, motionData } from "@/types";
 import { Session } from '@supabase/auth-helpers-nextjs'
 import { useSearchParams } from "next/navigation";
 import { fetchModelURLFromID } from "@/utils/supabase/fetchModelFromID";
@@ -24,6 +24,7 @@ import RoomMenu from "@/components/RoomMenu";
 import { useRouter } from 'next/navigation'
 import { fetchUserNameFromID } from "@/utils/supabase/fetchUserNameFromID";
 import LoadingModal from "@/components/LoadingModal";
+import { DataStreamMessageType } from "@skyway-sdk/room";
 
 export default function JoinRoomDynamicComponent({ session }: { session: Session | null }) {
     const router = useRouter()
@@ -61,11 +62,12 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
         switch (stream.contentType) {
             case 'data': {
                 //streamの追加時に実行
-                stream.onData.add((data: any) => { //TODO 型エラーの修正
-                    let target = otherVRMData.find((e) => e.user.id == data.user) //VRMデータの中からpublisherのモデルを探す
+                stream.onData.add((data: DataStreamMessageType) => {
+                    let motionData = data as motionData;
+                    let target = otherVRMData.find((e) => e.user.id == motionData.user) //VRMデータの中からpublisherのモデルを探す
 
                     if (target == null || cameraRef == null || cameraRef.current == null) { return }
-                    animateVRM(target.vrm, data.motion, cameraRef.current) //適当なHTMLVideoElement要素を渡す
+                    animateVRM(target.vrm, motionData.motion, cameraRef.current) //適当なHTMLVideoElement要素を渡す
                 });
             }
         }

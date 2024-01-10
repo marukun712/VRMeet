@@ -7,6 +7,7 @@ import {
     SkyWayRoom,
     SkyWayStreamFactory,
     RoomMember,
+    DataStreamMessageType,
 } from "@skyway-sdk/room";
 import { v4 } from "uuid"
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -14,7 +15,7 @@ import { VRM } from '@pixiv/three-vrm'
 import { VRMLoader } from '@/utils/motionCapture/VRMLoader';
 import { animateVRM } from "@/utils/motionCapture/animateVRM";
 import { getToken } from "@/utils/skyway/getToken";
-import { userAndVRMData } from "@/types";
+import { motionData, userAndVRMData } from "@/types";
 import { Session } from '@supabase/auth-helpers-nextjs'
 import { useThreeJS } from "@/hooks/useThreeJS";
 import { useUser } from "@/hooks/useUser";
@@ -60,11 +61,12 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
         switch (stream.contentType) {
             case 'data': {
                 //streamの追加時に実行
-                stream.onData.add((data: any) => { //TODO 型エラーの修正
-                    let target = otherVRMData.find((e) => e.user.id == data.user) //VRMデータの中からpublisherのモデルを探す
+                stream.onData.add((data: DataStreamMessageType) => {
+                    let motionData = data as motionData;
+                    let target = otherVRMData.find((e) => e.user.id == motionData.user) //VRMデータの中からpublisherのモデルを探す
 
                     if (target == null || cameraRef == null || cameraRef.current == null) { return }
-                    animateVRM(target.vrm, data.motion, cameraRef.current) //適当なHTMLVideoElement要素を渡す
+                    animateVRM(target.vrm, motionData.motion, cameraRef.current) //適当なHTMLVideoElement要素を渡す
                 });
             }
         }
