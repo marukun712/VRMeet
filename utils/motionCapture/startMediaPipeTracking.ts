@@ -6,7 +6,7 @@ import { animateVRM } from "@/utils/motionCapture/animateVRM"
 import { Holistic } from "@mediapipe/holistic"
 import { Camera } from "@mediapipe/camera_utils"
 
-export const startMediaPipeTracking = async (cameraRef: RefObject<HTMLVideoElement>, dataStream: LocalDataStream, myVRM: userAndVRMData, finishLoading: () => void) => {
+export const startMediaPipeTracking = (cameraRef: RefObject<HTMLVideoElement>, dataStream: LocalDataStream, myVRM: userAndVRMData, finishLoading: () => void) => {
     let loading = true;
 
     const sendMessage = async (motionData: Results) => {
@@ -55,5 +55,17 @@ export const startMediaPipeTracking = async (cameraRef: RefObject<HTMLVideoEleme
         width: 1280, //解像度を下げるほどFPSが向上する
         height: 720,
     });
-    camera.start();
+
+    const startCamera = async () => {
+        let promise = camera.start();
+
+        promise.then((_) => {
+            console.log("カメラを正常に開始しました。")
+        }).catch((error) => {
+            alert("カメラ映像の取得に失敗しました。カメラの使用権限を付与して再度参加してください。")
+            location.href = "/"
+        });
+    }
+
+    startCamera();
 }

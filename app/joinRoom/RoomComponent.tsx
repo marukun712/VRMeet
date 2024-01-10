@@ -37,19 +37,19 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
         return;
     }
 
-    const [loading, setIsLoading] = useState(true)
+    const [loading, setIsLoading] = useState(true);
     const [myVRM, setMyVRM] = useState<userAndVRMData>();
     const [log, setLog] = useState<string[]>([]);
     const [dataStream, setDataStream] = useState<LocalDataStream>();
-    let otherVRMData: userAndVRMData[] = []
+    let otherVRMData: userAndVRMData[] = [];
 
-    const { modelURL, user } = useUser(session) //ユーザーデータの取得
+    const { modelURL, user } = useUser(session); //ユーザーデータの取得
     const cameraRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const { scene } = useThreeJS(canvasRef); //ThreeJS Sceneの作成
 
     const finishLoading = useCallback(() => {
-        setIsLoading(false)
+        setIsLoading(false);
     }, [loading])
 
     //publicationを購読して他ユーザーから送信されたモーションデータをモデルに反映する
@@ -64,10 +64,10 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
                 //streamの追加時に実行
                 stream.onData.add((data: DataStreamMessageType) => {
                     let motionData = data as motionData;
-                    let target = otherVRMData.find((e) => e.user.id == motionData.user) //VRMデータの中からpublisherのモデルを探す
+                    let target = otherVRMData.find((e) => e.user.id == motionData.user); //VRMデータの中からpublisherのモデルを探す
 
-                    if (target == null || cameraRef == null || cameraRef.current == null) { return }
-                    animateVRM(target.vrm, motionData.motion, cameraRef.current) //適当なHTMLVideoElement要素を渡す
+                    if (target == null || cameraRef == null || cameraRef.current == null) { return };
+                    animateVRM(target.vrm, motionData.motion, cameraRef.current); //適当なHTMLVideoElement要素を渡す
                 });
             }
         }
@@ -76,39 +76,39 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
     //リモートユーザーのモデルをシーンに追加する
     const addRemoteUserModel = async (user: RoomMember) => {
         if (user.metadata == null || scene == null) { alert("ユーザーデータの取得に失敗しました。"); return; }
-        let userName = await fetchUserNameFromID(user.metadata)
-        setLog((pre) => [...pre, `${userName}さんが参加しました。`])
+        let userName = await fetchUserNameFromID(user.metadata);
+        setLog((pre) => [...pre, `${userName}さんが参加しました。`]);
 
-        let url = await fetchModelURLFromID(user.metadata)
+        let url = await fetchModelURLFromID(user.metadata);
         if (!url) { alert("リモートユーザーのモデル取得に失敗しました。再度ルームを建て直してください。") };
         //VRMモデルの読み込み
-        let otherVRMModel: VRM = await VRMLoader(url)
+        let otherVRMModel: VRM = await VRMLoader(url);
         scene.add(otherVRMModel.scene);
         otherVRMModel.scene.rotation.y = Math.PI;
 
-        let remoteMemberVRM: userAndVRMData = { user: user, vrm: otherVRMModel } //idからモデルを参照できるようにユーザーデータとモデルデータをオブジェクトに格納
-        otherVRMData.push(remoteMemberVRM)
+        let remoteMemberVRM: userAndVRMData = { user: user, vrm: otherVRMModel }; //idからモデルを参照できるようにユーザーデータとモデルデータをオブジェクトに格納
+        otherVRMData.push(remoteMemberVRM);
     }
 
     //リモートユーザー退出時にシーンからモデルを削除する
     const removeRemoteUserModel = async (user: RoomMember) => {
-        if (user.metadata == null || scene == null) { alert("ユーザーデータの取得に失敗しました。"); return; }
-        let userName = await fetchUserNameFromID(user.metadata)
-        setLog((pre) => [...pre, `${userName}さんが退出しました。`])
+        if (user.metadata == null || scene == null) { alert("ユーザーデータの取得に失敗しました。"); return; };
+        let userName = await fetchUserNameFromID(user.metadata);
+        setLog((pre) => [...pre, `${userName}さんが退出しました。`]);
 
-        let target = otherVRMData.find((e) => e.user.id == user.id) //VRMデータの中から退出ユーザーのモデルを探す
+        let target = otherVRMData.find((e) => e.user.id == user.id); //VRMデータの中から退出ユーザーのモデルを探す
 
-        if (target == null) { return }
-        scene.remove(target.vrm.scene) //モデルを削除
+        if (target == null) { return };
+        scene.remove(target.vrm.scene); //モデルを削除
         otherVRMData = otherVRMData.filter((e) => e.user.id !== user.id); //配列からユーザーの要素を削除
     }
 
     //ルーム参加時の処理
     const joinRoom = useCallback(async () => {
         try {
-            if (typeof modelURL !== "string") { return }
+            if (typeof modelURL !== "string") { return };
             //VRMモデルの読み込み
-            let myVRMModel: VRM = await VRMLoader(modelURL)
+            let myVRMModel: VRM = await VRMLoader(modelURL);
 
             //シーンに追加
             if (scene == null) { alert("シーンが作成されていません。ページをリロードしてください。"); return; }
@@ -120,7 +120,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
 
             //dataStreamを作成
             const dataStream = await SkyWayStreamFactory.createDataStream();
-            setDataStream(dataStream)
+            setDataStream(dataStream);
 
             if (token == null || dataStream == null || id == null) return;
             const context = await SkyWayContext.Create(token);
@@ -139,9 +139,9 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
 
             //入室
             let me = await room.join({ metadata: user?.id }); //メタデータにSupabaseのユーザーIDを付与する
-            let myVRM: userAndVRMData = { user: me, vrm: myVRMModel }
-            setMyVRM(myVRM)
-            setLog((pre) => [...pre, `ルームID${room.name}でルームに参加しました。`])
+            let myVRM: userAndVRMData = { user: me, vrm: myVRMModel };
+            setMyVRM(myVRM);
+            setLog((pre) => [...pre, `ルームID${room.name}でルームに参加しました。`]);
 
             //dataStreamをpublishする
             await me.publish(dataStream);
@@ -149,18 +149,18 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
             //既に参加しているメンバーのモデルをロード
             room.members.forEach(async (e) => {
                 if (e.state == "joined" && e.id !== myVRM.user.id) {
-                    addRemoteUserModel(e)
+                    addRemoteUserModel(e);
                 }
             })
 
             //メンバーの参加時にモデルをロード
             room.onMemberJoined.add(async (e) => {
-                addRemoteUserModel(e.member)
+                addRemoteUserModel(e.member);
             })
 
             //メンバーの退出時にモデルを削除
             room.onMemberLeft.add(async (e) => {
-                removeRemoteUserModel(e.member)
+                removeRemoteUserModel(e.member);
             })
 
             //ルームのpublicationsをsubscribeしておく
@@ -169,7 +169,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
             //publicationsの追加時に実行
             room.onStreamPublished.add((e) => subscribeAndAttach(e.publication, me));
         } catch (e) {
-            alert("問題が発生しました。ルームIDが間違っている可能性があります。")
+            alert("問題が発生しました。ルームIDが間違っている可能性があります。");
         }
     }, [scene, dataStream, myVRM, otherVRMData, modelURL])
 
