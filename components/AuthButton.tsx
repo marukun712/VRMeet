@@ -5,7 +5,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 export default function AuthForm() {
     const supabase = createClientComponentClient()
-    const redirectURL = `http://localhost:3000/auth/callback`
+    const redirectURL = `https://vrmeet-collab.vercel.app/auth/callback`
 
     return (
         <SocialAuth

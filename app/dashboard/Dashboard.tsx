@@ -176,7 +176,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                                 className='input input-bordered input-primary w-full max-w-xs m-2'
                                 onChange={(e) => setRoomID(e.target.value)}
                             />
-                            <button className="btn btn-primary m-auto" onClick={() => router.push(`http://localhost:3000/joinRoom?id=${roomID}`)}>ルームに参加</button>
+                            <button className="btn btn-primary m-auto" onClick={() => router.push(`https://vrmeet-collab.vercel.app/joinRoom?id=${roomID}`)}>ルームに参加</button>
                         </div>
 
                         <Modal id="model_setting">

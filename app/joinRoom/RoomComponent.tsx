@@ -187,7 +187,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
 
     return (
         <div>
-            {id && scene && myVRM ? <RoomMenu roomID={id} roomURL={`http://localhost:3000/joinRoom?id=${id}`} scene={scene} me={myVRM.user} /> : ""}
+            {id && scene && myVRM ? <RoomMenu roomID={id} roomURL={`https://vrmeet-collab.vercel.app/joinRoom?id=${id}`} scene={scene} me={myVRM.user} /> : ""}
             {loading ? <LoadingModal message='ルームに参加中です。タブがフリーズすることがありますが、数秒で改善しますのでそのままお待ちください。' /> : ""}
 
             {/* ログの表示 */}
