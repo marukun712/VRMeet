@@ -103,68 +103,72 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
 
     //ルーム参加時の処理
     const joinRoom = useCallback(async () => {
-        if (typeof modelURL !== "string") { return }
-        //VRMモデルの読み込み
-        let myVRMModel: VRM = await VRMLoader(modelURL)
+        try {
+            if (typeof modelURL !== "string") { return }
+            //VRMモデルの読み込み
+            let myVRMModel: VRM = await VRMLoader(modelURL)
 
-        //シーンに追加
-        if (scene == null) { alert("シーンが作成されていません。ページをリロードしてください。"); return; }
-        scene.add(myVRMModel.scene);
+            //シーンに追加
+            if (scene == null) { alert("シーンが作成されていません。ページをリロードしてください。"); return; }
+            scene.add(myVRMModel.scene);
 
-        myVRMModel.scene.rotation.y = Math.PI; // モデルが正面を向くように180度回転させる
+            myVRMModel.scene.rotation.y = Math.PI; // モデルが正面を向くように180度回転させる
 
-        const token: string = await getToken();
+            const token: string = await getToken();
 
-        //dataStreamを作成
-        const dataStream = await SkyWayStreamFactory.createDataStream();
-        setDataStream(dataStream)
+            //dataStreamを作成
+            const dataStream = await SkyWayStreamFactory.createDataStream();
+            setDataStream(dataStream)
 
-        if (token == null || dataStream == null || id == null) return;
-        const context = await SkyWayContext.Create(token);
+            if (token == null || dataStream == null || id == null) return;
+            const context = await SkyWayContext.Create(token);
 
-        //roomの取得
-        const room = await SkyWayRoom.Find(context, {
-            name: id,
-        }, "p2p");
+            //roomの取得
+            const room = await SkyWayRoom.Find(context, {
+                name: id,
+            }, "p2p");
 
 
-        //同時接続数を最大3名までに設定
-        if (room.members.length >= 3) {
-            console.log("人数が上限に達しています");
-            return;
-        }
-
-        //入室
-        let me = await room.join({ metadata: user?.id }); //メタデータにSupabaseのユーザーIDを付与する
-        let myVRM: userAndVRMData = { user: me, vrm: myVRMModel }
-        setMyVRM(myVRM)
-        setLog((pre) => [...pre, `ルームID${room.name}でルームに参加しました。`])
-
-        //dataStreamをpublishする
-        await me.publish(dataStream);
-
-        //既に参加しているメンバーのモデルをロード
-        room.members.forEach(async (e) => {
-            if (e.state == "joined" && e.id !== myVRM.user.id) {
-                addRemoteUserModel(e)
+            //同時接続数を最大3名までに設定
+            if (room.members.length >= 3) {
+                console.log("人数が上限に達しています");
+                return;
             }
-        })
 
-        //メンバーの参加時にモデルをロード
-        room.onMemberJoined.add(async (e) => {
-            addRemoteUserModel(e.member)
-        })
+            //入室
+            let me = await room.join({ metadata: user?.id }); //メタデータにSupabaseのユーザーIDを付与する
+            let myVRM: userAndVRMData = { user: me, vrm: myVRMModel }
+            setMyVRM(myVRM)
+            setLog((pre) => [...pre, `ルームID${room.name}でルームに参加しました。`])
 
-        //メンバーの退出時にモデルを削除
-        room.onMemberLeft.add(async (e) => {
-            removeRemoteUserModel(e.member)
-        })
+            //dataStreamをpublishする
+            await me.publish(dataStream);
 
-        //ルームのpublicationsをsubscribeしておく
-        room.publications.forEach((e) => subscribeAndAttach(e, me));
+            //既に参加しているメンバーのモデルをロード
+            room.members.forEach(async (e) => {
+                if (e.state == "joined" && e.id !== myVRM.user.id) {
+                    addRemoteUserModel(e)
+                }
+            })
 
-        //publicationsの追加時に実行
-        room.onStreamPublished.add((e) => subscribeAndAttach(e.publication, me));
+            //メンバーの参加時にモデルをロード
+            room.onMemberJoined.add(async (e) => {
+                addRemoteUserModel(e.member)
+            })
+
+            //メンバーの退出時にモデルを削除
+            room.onMemberLeft.add(async (e) => {
+                removeRemoteUserModel(e.member)
+            })
+
+            //ルームのpublicationsをsubscribeしておく
+            room.publications.forEach((e) => subscribeAndAttach(e, me));
+
+            //publicationsの追加時に実行
+            room.onStreamPublished.add((e) => subscribeAndAttach(e.publication, me));
+        } catch (e) {
+            alert("問題が発生しました。ルームIDが間違っている可能性があります。")
+        }
     }, [scene, dataStream, myVRM, otherVRMData, modelURL])
 
     //Sceneの作成後にルームに参加
