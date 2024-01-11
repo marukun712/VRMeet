@@ -107,9 +107,8 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
     //ルーム参加時の処理
     const joinRoom = useCallback(async () => {
         try {
-            if (typeof modelURL !== "string") { return };
             //VRMモデルの読み込み
-            let myVRMModel: VRM = await VRMLoader(modelURL);
+            let myVRMModel: VRM = await VRMLoader(modelURL as string);
 
             //シーンに追加
             if (scene == null) { alert("シーンが作成されていません。ページをリロードしてください。"); return; }
@@ -123,7 +122,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
             const dataStream = await SkyWayStreamFactory.createDataStream();
             setDataStream(dataStream);
 
-            if (token == null || dataStream == null || id == null) return;
+            if (token == null || dataStream == null || id == null) { throw new Error("tokenの取得エラー") };
             const context = await SkyWayContext.Create(token);
 
             //roomの取得

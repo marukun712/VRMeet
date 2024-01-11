@@ -1,8 +1,16 @@
-export default function Header(): JSX.Element {
+import { NextFont } from "next/dist/compiled/@next/font"
+
+type Props = {
+    font: NextFont
+}
+
+export default function Header(props: Props): JSX.Element {
     return (
-        <div className="navbar">
+        <div className="navbar relative glass">
             <div className="flex-1">
-                <a className="btn btn-ghost text-xl">VRMeet</a>
+                <div className={props.font.className}>
+                    <a className="btn btn-ghost text-xl">VRMeet</a>
+                </div>
             </div>
         </div>
     )

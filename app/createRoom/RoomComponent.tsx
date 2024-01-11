@@ -106,9 +106,8 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
     //ルーム参加時の処理
     const CreateRoom = useCallback(async () => {
         try {
-            if (typeof modelURL !== "string") { return }
             //VRMモデルの読み込み
-            let myVRMModel: VRM = await VRMLoader(modelURL);
+            let myVRMModel: VRM = await VRMLoader(modelURL as string);
 
             //シーンに追加
             if (scene == null) { alert("シーンが作成されていません。ページをリロードしてください。"); return; }
@@ -122,7 +121,7 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
             const dataStream = await SkyWayStreamFactory.createDataStream();
             setDataStream(dataStream);
 
-            if (token == null || dataStream == null) return;
+            if (token == null || dataStream == null) { throw new Error("tokenの取得エラー") };
             const context = await SkyWayContext.Create(token);
 
             //roomの作成
