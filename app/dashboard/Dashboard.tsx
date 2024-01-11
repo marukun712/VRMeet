@@ -108,6 +108,8 @@ export default function Dashboard({ session }: { session: Session | null }) {
             alert("モデルの削除に失敗しました。")
         }
 
+        let model_url = null //エラーを防ぐため自分のmodel_urlテーブルからからモデルのURLを削除する
+        updateModel({ model_url })
         alert("モデルを削除しました。")
         location.reload();
     }
@@ -219,7 +221,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                             <div>
                                 <button
                                     className="btn btn-primary"
-                                    onClick={() => updateProfile({ fullname })}
+                                    onClick={() => { if (fullname == undefined) { return; } updateProfile({ fullname }) }}
                                     disabled={loading}
                                 >
                                     {loading ? 'Loading ...' : '保存'}

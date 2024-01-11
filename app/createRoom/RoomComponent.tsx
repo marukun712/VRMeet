@@ -106,8 +106,9 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
     //ルーム参加時の処理
     const CreateRoom = useCallback(async () => {
         try {
+            if (modelURL == null) { return; }
             //VRMモデルの読み込み
-            let myVRMModel: VRM = await VRMLoader(modelURL as string);
+            let myVRMModel: VRM = await VRMLoader(modelURL);
 
             //シーンに追加
             if (scene == null) { alert("シーンが作成されていません。ページをリロードしてください。"); return; }
@@ -172,9 +173,10 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
     }, [scene, dataStream, myVRM, otherVRMData, modelURL])
 
     useEffect(() => {
-        if (scene == null && modelURL == null) { return };
+        if (scene == null && loading) { return };
+        if (modelURL == null) { alert("先にモデルをアップロードしてください！"); return; }
         CreateRoom();
-    }, [scene, modelURL])
+    }, [modelURL])
 
     //myVRMの更新時に姿勢推定を開始
     useEffect(() => {

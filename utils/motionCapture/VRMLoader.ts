@@ -18,7 +18,7 @@ export function VRMLoader(path: string): Promise<VRM> {
 
             (progress) => console.log("Loading model...", 100.0 * (progress.loaded / progress.total), "%"),
 
-            (error) => { alert("モデルのダウンロードに失敗しました。モデルがアップロードされているか確認してください。"); reject(error); }
+            (error) => { alert("モデルのダウンロードに失敗しました。モデルが正常にアップロードされているか確認してください。"); reject(error); }
         );
     });
 }

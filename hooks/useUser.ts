@@ -4,10 +4,10 @@ import { Session, createClientComponentClient } from '@supabase/auth-helpers-nex
 export const useUser = (session: Session) => {
     const supabase = createClientComponentClient()
     const [loading, setLoading] = useState(true)
-    const [fullname, setFullname] = useState<string | null>(null)
-    const [username, setUsername] = useState<string | null>(null)
-    const [avatarURL, setAvatarUrl] = useState<string | null>(null)
-    const [modelURL, setModelURL] = useState<string | null>(null)
+    const [fullname, setFullname] = useState<string | null>()
+    const [username, setUsername] = useState<string | null>()
+    const [avatarURL, setAvatarUrl] = useState<string | null>()
+    const [modelURL, setModelURL] = useState<string | null>()
     const user = session?.user
 
     const getProfile = useCallback(async () => {
