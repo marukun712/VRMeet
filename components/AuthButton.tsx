@@ -6,6 +6,7 @@ import { siteURL } from '@/constants/siteURL'
 
 export default function AuthForm() {
     const supabase = createClientComponentClient()
+    console.log(siteURL)
 
     return (
         <SocialAuth
