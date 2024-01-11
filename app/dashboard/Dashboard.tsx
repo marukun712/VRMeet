@@ -43,7 +43,6 @@ export default function Dashboard({ session }: { session: Session | null }) {
             if (error) { throw error }
             alert('プロフィールが更新されました!')
         } catch (error) {
-            console.log(error)
             alert('プロフィールの更新にエラーが発生しました')
         } finally {
             setLoading(false)
