@@ -166,6 +166,7 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
             room.onStreamPublished.add((e) => subscribeAndAttach(e.publication, me));
 
         } catch (e) {
+            console.log(e)
             alert("問題が発生しました。再度ルームを作り直してください。");
         }
     }, [scene, dataStream, myVRM, otherVRMData, modelURL])
