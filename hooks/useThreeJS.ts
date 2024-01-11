@@ -37,6 +37,26 @@ export const useThreeJS = (canvasRef: RefObject<HTMLCanvasElement>) => {
             light.position.set(1.0, 1.0, 1.0).normalize();
             scene.add(light);
 
+            //リサイズ処理
+            const onResize = () => {
+                // サイズを取得
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+
+                // レンダラーのサイズを調整する
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setSize(width, height);
+
+                // カメラのアスペクト比を正す
+                orbitCamera.aspect = width / height;
+                orbitCamera.updateProjectionMatrix();
+            }
+
+            // 初期化のために実行
+            onResize();
+            // リサイズイベント発生時に実行
+            window.addEventListener('resize', onResize);
+
             //アニメーション
             function animate() {
                 requestAnimationFrame(animate); //loop

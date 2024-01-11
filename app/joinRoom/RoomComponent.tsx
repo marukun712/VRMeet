@@ -44,7 +44,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
     const [dataStream, setDataStream] = useState<LocalDataStream>();
     let otherVRMData: userAndVRMData[] = [];
 
-    const { modelURL, user } = useUser(session); //ユーザーデータの取得
+    const { modelURL, setModelURL, user } = useUser(session); //ユーザーデータの取得
     const cameraRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const { scene } = useThreeJS(canvasRef); //ThreeJS Sceneの作成
@@ -81,7 +81,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
         setLog((pre) => [...pre, `${userName}さんが参加しました。`]);
 
         let url = await fetchModelURLFromID(user.metadata);
-        if (!url) { alert("リモートユーザーのモデル取得に失敗しました。再度ルームを建て直してください。") };
+        if (!url) { return; };
         //VRMモデルの読み込み
         let otherVRMModel: VRM = await VRMLoader(url);
         scene.add(otherVRMModel.scene);
@@ -105,11 +105,11 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
     }
 
     //ルーム参加時の処理
-    const joinRoom = useCallback(async () => {
+    const joinRoom = useCallback(async (model: string) => {
         try {
-            if (modelURL == null) { return; }
+            if (model == null) { return; }
             //VRMモデルの読み込み
-            let myVRMModel: VRM = await VRMLoader(modelURL);
+            let myVRMModel: VRM = await VRMLoader(model);
 
             //シーンに追加
             if (scene == null) { alert("シーンが作成されていません。ページをリロードしてください。"); return; }
@@ -172,12 +172,17 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
         } catch (e) {
             alert("問題が発生しました。ルームIDが間違っている可能性があります。");
         }
-    }, [scene, dataStream, myVRM, otherVRMData, modelURL])
+    }, [scene, dataStream, myVRM, otherVRMData])
 
     useEffect(() => {
         if (scene == null && loading) { return };
-        if (modelURL == null) { alert("先にモデルをアップロードしてください！"); return; }
-        joinRoom();
+        if (modelURL == null) {
+            alert("アップロードされたモデルが見つかりませんでした。代わりに初期モデルをロードします。");
+            joinRoom("https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981"); //初期モデルを使用する
+            return;
+        }
+
+        joinRoom(modelURL);
     }, [modelURL])
 
     //myVRMの更新時に姿勢推定を開始

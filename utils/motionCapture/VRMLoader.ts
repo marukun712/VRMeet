@@ -3,6 +3,7 @@ import { VRM, VRMUtils } from '@pixiv/three-vrm'
 
 export function VRMLoader(path: string): Promise<VRM> {
     const loader = new GLTFLoader();
+    loader.crossOrigin = "anonymous";
 
     return new Promise((resolve, reject) => {
         loader.load(
