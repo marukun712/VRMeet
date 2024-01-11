@@ -28,7 +28,7 @@ import { DataStreamMessageType } from "@skyway-sdk/room";
 import { siteURL } from "@/constants/siteURL";
 
 export default function JoinRoomDynamicComponent({ session }: { session: Session | null }) {
-    const router = useRouter()
+    const router = useRouter();
     const searchParams = useSearchParams();
     const id = searchParams.get("id"); //ルームIDの取得
 

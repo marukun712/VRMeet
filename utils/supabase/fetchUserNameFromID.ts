@@ -6,7 +6,7 @@ export const fetchUserNameFromID = async (id: string) => {
     try {
         let { data, error, status } = await supabase
             .from('profiles')
-            .select(`username`)
+            .select(`full_name`)
             .eq('id', id)
             .single()
 
@@ -15,7 +15,7 @@ export const fetchUserNameFromID = async (id: string) => {
         }
 
         if (data) {
-            return data.username
+            return data.full_name
         }
     } catch (error) {
         alert("リモートユーザーのユーザーネーム取得に失敗しました。")

@@ -21,15 +21,13 @@ export default function Dashboard({ session }: { session: Session | null }) {
     const { loading, setLoading, fullname, setFullname, username, setUsername, modelURL, setModelURL, avatarURL, user } = useUser(session); //ユーザーデータの取得
     const { myModels } = useModel(user.id);
     const [roomID, setRoomID] = useState("");
-    const router = useRouter()
+    const router = useRouter();
 
     //ユーザーネームの更新
     const updateProfile = async ({
         fullname,
-        username,
     }: {
         fullname: string | null
-        username: string | null
     }) => {
         try {
             setLoading(true)
@@ -37,7 +35,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
             let { error } = await supabase.from('profiles').upsert({
                 id: user?.id as string,
                 full_name: fullname,
-                username,
+                username: username,
                 avatar_url: avatarURL,
                 model_url: modelURL,
                 updated_at: new Date().toISOString(),
@@ -45,7 +43,8 @@ export default function Dashboard({ session }: { session: Session | null }) {
             if (error) { throw error }
             alert('プロフィールが更新されました!')
         } catch (error) {
-            alert('プロフィールの更新にエラーが発生しました。')
+            console.log(error)
+            alert('プロフィールの更新にエラーが発生しました')
         } finally {
             setLoading(false)
         }
@@ -167,7 +166,8 @@ export default function Dashboard({ session }: { session: Session | null }) {
                 {loading ? <LoadingModal message="ユーザーデータを取得中..." /> : ""}
                 <div className='flex py-5'>
                     <div>
-                        {fullname && avatarURL ? <UserIcon username={fullname} avatarURL={avatarURL} /> : ""}
+                        {fullname ? <h1 className='text-2xl py-10 text-center'>{fullname}さん、ようこそ。</h1> : ""}
+                        {avatarURL ? <UserIcon avatarURL={avatarURL} /> : ""}
 
                         <div className='flex'>
                             <input
@@ -208,7 +208,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                         <Modal id="user_setting">
                             <h1 className='text-2xl'>ユーザー情報の編集</h1>
                             <div>
-                                <label htmlFor="fullName">フルネーム</label>
+                                <label htmlFor="fullName">ユーザーネーム</label>
                                 <input
                                     id="fullName"
                                     type="text"
@@ -218,19 +218,9 @@ export default function Dashboard({ session }: { session: Session | null }) {
                                 />
                             </div>
                             <div>
-                                <label htmlFor="username">ユーザーネーム</label>
-                                <input
-                                    id="username"
-                                    type="text"
-                                    value={username || ''}
-                                    className='input input-bordered input-primary w-full max-w-xs m-2'
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
-                            </div>
-                            <div>
                                 <button
                                     className="btn btn-primary"
-                                    onClick={() => updateProfile({ fullname, username })}
+                                    onClick={() => updateProfile({ fullname })}
                                     disabled={loading}
                                 >
                                     {loading ? 'Loading ...' : '保存'}
