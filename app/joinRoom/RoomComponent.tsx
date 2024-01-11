@@ -122,7 +122,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
             const dataStream = await SkyWayStreamFactory.createDataStream();
             setDataStream(dataStream);
 
-            if (token == null || dataStream == null || id == null) { throw new Error("tokenの取得エラー") };
+            if (token == null || dataStream == null || id == null) { return; };
             const context = await SkyWayContext.Create(token);
 
             //roomの取得

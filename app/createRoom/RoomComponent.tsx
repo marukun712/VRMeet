@@ -121,7 +121,7 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
             const dataStream = await SkyWayStreamFactory.createDataStream();
             setDataStream(dataStream);
 
-            if (token == null || dataStream == null) { throw new Error("tokenの取得エラー") };
+            if (token == null || dataStream == null) { return; };
             const context = await SkyWayContext.Create(token);
 
             //roomの作成
