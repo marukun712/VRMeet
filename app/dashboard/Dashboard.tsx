@@ -12,6 +12,7 @@ import { useModel } from '@/hooks/useModel'
 import ModelDetails from './ModelDetails'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { siteURL } from '@/constants/siteURL'
 
 export default function Dashboard({ session }: { session: Session | null }) {
     const supabase = createClientComponentClient();
@@ -140,7 +141,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
         }
 
         const file = event.target.files[0]
-        const extension = file.name.split(".")[1]
+        const extension = file.name.split('.').pop();
         if (extension !== "vrm") {
             alert(".vrmのファイルのみアップロード可能です。")
         } else {
@@ -176,7 +177,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                                 className='input input-bordered input-primary w-full max-w-xs m-2'
                                 onChange={(e) => setRoomID(e.target.value)}
                             />
-                            <button className="btn btn-primary m-auto" onClick={() => router.push(`https://vrmeet-collab.vercel.app/joinRoom?id=${roomID}`)}>ルームに参加</button>
+                            <button className="btn btn-primary m-auto" onClick={() => router.push(`${siteURL}/joinRoom?id=${roomID}`)}>ルームに参加</button>
                         </div>
 
                         <Modal id="model_setting">

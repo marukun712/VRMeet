@@ -25,6 +25,7 @@ import RoomMenu from "@/components/RoomMenu";
 import { useRouter } from 'next/navigation'
 import { fetchUserNameFromID } from "@/utils/supabase/fetchUserNameFromID";
 import LoadingModal from "@/components/LoadingModal";
+import { siteURL } from "@/constants/siteURL";
 
 export default function CreateRoomDynamicComponent({ session }: { session: Session | null }) {
     const router = useRouter();
@@ -183,7 +184,7 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
 
     return (
         <div>
-            {roomID && scene && myVRM ? <RoomMenu roomID={roomID} roomURL={`https://vrmeet-collab.vercel.app/joinRoom?id=${roomID}`} scene={scene} me={myVRM.user} /> : ""}
+            {roomID && scene && myVRM ? <RoomMenu roomID={roomID} roomURL={`${siteURL}/joinRoom?id=${roomID}`} scene={scene} me={myVRM.user} /> : ""}
             {loading ? <LoadingModal message='ルームに参加中です。タブがフリーズすることがありますが、数秒で改善しますのでそのままお待ちください。' /> : ""}
 
             {/* ログの表示 */}
