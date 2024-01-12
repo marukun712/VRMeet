@@ -81,7 +81,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
         setLog((pre) => [...pre, `${userName}さんが参加しました。`]);
 
         let url = await fetchModelURLFromID(user.metadata);
-        if (!url) { return; };
+        if (!url) { url = "https://cdn.glitch.com/29e07830-2317-4b15-a044-135e73c7f840%2FAshtra.vrm?v=1630342336981"; } //初期モデルをロード
         //VRMモデルの読み込み
         let otherVRMModel: VRM = await VRMLoader(url);
         scene.add(otherVRMModel.scene);
