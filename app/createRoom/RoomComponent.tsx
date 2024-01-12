@@ -15,7 +15,7 @@ import { VRM } from '@pixiv/three-vrm'
 import { VRMLoader } from '@/utils/motionCapture/VRMLoader';
 import { animateVRM } from "@/utils/motionCapture/animateVRM";
 import { getToken } from "@/utils/skyway/getToken";
-import { motionData, userAndVRMData } from "@/types";
+import { motionData, userAndVRMData, controlData } from "@/types";
 import { Session } from '@supabase/auth-helpers-nextjs'
 import { useThreeJS } from "@/hooks/useThreeJS";
 import { useUser } from "@/hooks/useUser";
@@ -41,12 +41,14 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
     const [log, setLog] = useState<string[]>([]);
     const [roomID, setRoomID] = useState<string>();
     const [dataStream, setDataStream] = useState<LocalDataStream>();
+    let controls: controlData[] = [];
     let otherVRMData: userAndVRMData[] = [];
+    let usedSpawnPoint = false;
 
-    const { modelURL, setModelURL, user } = useUser(session); //ユーザーデータの取得
+    const { modelURL, user } = useUser(session); //ユーザーデータの取得
     const cameraRef = useRef<HTMLVideoElement | null>(null);
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const { scene } = useThreeJS(canvasRef); //ThreeJS Sceneの作成
+    const { scene, createTransformControls } = useThreeJS(canvasRef); //ThreeJS Sceneの作成
 
     const finishLoading = useCallback(() => {
         setIsLoading(false);
@@ -84,7 +86,16 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
         //VRMモデルの読み込み
         let otherVRMModel: VRM = await VRMLoader(url);
         scene.add(otherVRMModel.scene);
+        if (!usedSpawnPoint) { //モデルの初期位置が被らないように切り替え
+            otherVRMModel.scene.position.x = 2
+        } else {
+            otherVRMModel.scene.position.x = -2
+        }
+
         otherVRMModel.scene.rotation.y = Math.PI;
+
+        let transformControls = createTransformControls(otherVRMModel.scene)!;
+        controls.push({ control: transformControls, id: user.id });
 
         let remoteMemberVRM: userAndVRMData = { user: user, vrm: otherVRMModel }; //idからモデルを参照できるようにユーザーデータとモデルデータをオブジェクトに格納
         otherVRMData.push(remoteMemberVRM);
@@ -96,10 +107,13 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
         let userName = await fetchUserNameFromID(user.metadata);
         setLog((pre) => [...pre, `${userName}さんが退出しました。`])
 
-        let target = otherVRMData.find((e) => e.user.id == user.id); //VRMデータの中から退出ユーザーのモデルを探す
+        let targetModel = otherVRMData.find((e) => e.user.id == user.id); //VRMデータの中から退出ユーザーのモデルを探す
+        let targetControl = controls.find((e) => e.id == user.id); //VRMデータの中から退出ユーザーのモデルを探す
 
-        if (target == null) { return };
-        scene.remove(target.vrm.scene); //モデルを削除
+        if (targetModel == null || targetControl == null) { return };
+        scene.remove(targetModel.vrm.scene); //モデルを削除
+        targetControl.control.detach();
+        targetControl.control.dispose(); //コントロールを削除       
         otherVRMData = otherVRMData.filter((e) => e.user.id !== user.id); //配列からユーザーの要素を削除
     }
 
@@ -112,9 +126,10 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
 
             //シーンに追加
             if (scene == null) { alert("シーンが作成されていません。ページをリロードしてください。"); return; }
-            scene.add(myVRMModel.scene);
-
             myVRMModel.scene.rotation.y = Math.PI; // モデルが正面を向くように180度回転させる
+            createTransformControls(myVRMModel.scene)!;
+
+            scene.add(myVRMModel.scene);
 
             const token: string = await getToken();
 
