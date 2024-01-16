@@ -1,6 +1,6 @@
 'use client'
 import { Session, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { ChangeEvent } from 'react'
+import { ChangeEvent, useEffect } from 'react'
 import LoadingModal from '@/components/LoadingModal'
 import UserIcon from './UserIcon'
 import SignOutForm from './SignOutForm'
@@ -26,7 +26,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
     const supabase = createClientComponentClient();
 
     if (!session) { return }
-    const { loading, setLoading, fullname, setFullname, username, setUsername, modelURL, setModelURL, avatarURL, user } = useUser(session); //ユーザーデータの取得
+    const { loading, setLoading, fullname, setFullname, username, modelURL, setModelURL, avatarURL, user } = useUser(session); //ユーザーデータの取得
     const { myModels } = useModel(user.id);
     const [roomID, setRoomID] = useState("");
     const router = useRouter();
@@ -204,6 +204,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
 
                             })}
                             <p>モデルをアップロード</p>
+                            <p className='text-gray-500 text-sm'>※VRM-0.xのVRMモデルにのみ対応しています。</p>
                             <input type="file" accept=".vrm" className="file-input w-full max-w-xs my-6" onChange={handleVRMChange} />
                         </Modal>
 
