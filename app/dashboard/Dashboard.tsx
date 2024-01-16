@@ -1,6 +1,6 @@
 'use client'
 import { Session, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { ChangeEvent, useEffect } from 'react'
+import { ChangeEvent } from 'react'
 import LoadingModal from '@/components/LoadingModal'
 import UserIcon from './UserIcon'
 import SignOutForm from './SignOutForm'

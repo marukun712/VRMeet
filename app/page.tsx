@@ -41,7 +41,7 @@ export default function Home(): JSX.Element {
             </div>
 
             <div className="relative py-20 md:flex justify-center hidden">
-                <Image src={"/images/top.png"} alt="top image" width={1664} height={936} className="rounded-lg"></Image>
+                <Image src={"/images/top.png"} alt="top image" width={1664} height={936} className="rounded-lg outline outline-8 outline-offset-8 outline-purple-400"></Image>
             </div>
         </div >
     )
