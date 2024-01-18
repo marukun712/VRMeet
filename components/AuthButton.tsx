@@ -4,7 +4,7 @@ import { ThemeSupa } from '@supabase/auth-ui-shared'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { siteURL } from '@/constants/siteURL'
 
-export default function AuthForm() {
+export default function AuthButton(): JSX.Element {
     const supabase = createClientComponentClient()
 
     return (

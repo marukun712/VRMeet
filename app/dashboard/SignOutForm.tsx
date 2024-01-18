@@ -1,9 +1,9 @@
-export default function SignOutForm() {
+export default function SignOutForm(): JSX.Element {
     return (
         <div className="py-5">
             <form action="/auth/signout" method="post">
                 <button className="btn" type="submit">
-                    サインアウト
+                    サインアウトする
                 </button>
             </form>
         </div>

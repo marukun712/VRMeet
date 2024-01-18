@@ -13,14 +13,8 @@ import ModelDetails from './ModelDetails'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { siteURL } from '@/constants/siteURL'
-import { Bagel_Fat_One } from "next/font/google";
 import Header from '@/components/Header'
 import Drawer from '@/components/Drawer'
-
-const BagelFatOne = Bagel_Fat_One({
-    weight: "400",
-    subsets: ["latin"],
-});
 
 export default function Dashboard({ session }: { session: Session | null }) {
     const supabase = createClientComponentClient();
@@ -149,7 +143,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
         }
 
         const file = event.target.files[0]
-        const extension = file.name.split('.').pop();
+        const extension = file.name.split('.').pop(); //.vrm.pngのような拡張子がチェックを通過しないように最後の要素を取得する
         if (extension !== "vrm") {
             alert(".vrmのファイルのみアップロード可能です。")
         } else {
@@ -163,7 +157,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
 
     return (
         <div>
-            <Header font={BagelFatOne} />
+            <Header />
             <Drawer>
                 {loading ? <LoadingModal message="ユーザーデータを取得中..." /> : ""}
                 <div className='flex py-5'>
@@ -179,7 +173,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                                 className='input input-bordered input-primary w-full max-w-xs m-2'
                                 onChange={(e) => setRoomID(e.target.value)}
                             />
-                            <button className="btn btn-primary m-auto" onClick={() => router.push(`${siteURL}/joinRoom?id=${roomID}`)}>ルームに参加</button>
+                            <button className="btn btn-primary m-auto" onClick={() => router.push(`${siteURL}/joinRoom?id=${roomID}`)} disabled={!roomID}>既存のルームに参加</button>
                         </div>
 
                         <Modal id="model_setting">
@@ -224,7 +218,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                                 <button
                                     className="btn btn-primary"
                                     onClick={() => { if (fullname == undefined) { return; } updateProfile({ fullname }) }}
-                                    disabled={loading}
+                                    disabled={loading || !fullname}
                                 >
                                     {loading ? 'Loading ...' : '保存'}
                                 </button>
@@ -233,7 +227,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
 
                         <div className='py-10 flex justify-center'>
                             <div>
-                                <Link href={"/createRoom"} className='btn bg-green-500'>ルームを開く</Link>
+                                <Link href={"/createRoom"} className='btn bg-green-500'>ルームを新規作成</Link>
                                 <SignOutForm />
                             </div>
                         </div>

@@ -1,4 +1,4 @@
-export default function BackGround() {
+export default function BackGround(): JSX.Element {
     return (
         <div className="background">
             <span></span>

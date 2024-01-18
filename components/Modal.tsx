@@ -4,7 +4,7 @@ type Props = {
     children: ReactNode;
     id: string
 };
-export default function Modal(props: Props) {
+export default function Modal(props: Props): JSX.Element {
     return (
         <div>
             <dialog id={props.id} className="modal modal-bottom sm:modal-middle">

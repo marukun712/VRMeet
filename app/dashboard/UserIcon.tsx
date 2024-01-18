@@ -2,7 +2,7 @@ type Props = {
     avatarURL: string
 }
 
-export default function UserIcon(props: Props) {
+export default function UserIcon(props: Props): JSX.Element {
     return (
         <div>
             <div className="avatar justify-center flex">

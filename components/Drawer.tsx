@@ -4,7 +4,7 @@ type Props = {
     children: ReactNode
 }
 
-export default function Drawer(props: Props) {
+export default function Drawer(props: Props): JSX.Element {
     return (
         <div className="drawer lg:drawer-open">
             <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />

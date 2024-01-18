@@ -11,7 +11,7 @@ type Props = {
     scene: THREE.Scene
     me: RoomMember
 }
-export default function RoomMenu(props: Props) {
+export default function RoomMenu(props: Props): JSX.Element {
     const menuRef = useRef<HTMLDivElement | null>(null);
     const [isShowMenu, setIsShowMenu] = useState(true)
     const [bgColor, setBGColor] = useState("");
@@ -37,7 +37,7 @@ export default function RoomMenu(props: Props) {
 
                     <h1 className="py-3">16進数カラーコードで背景色を設定</h1>
                     <input type="text" placeholder="カラーコードを入力..." className="input input-bordered input-primary w-full max-w-xs" value={bgColor} onChange={(e) => setBGColor(e.target.value)} />
-                    <button className="btn btn-primary" onClick={() => props.scene.background = new THREE.Color(bgColor)}>背景色を適用</button>
+                    <button className="btn btn-primary" onClick={() => props.scene.background = new THREE.Color(bgColor)} disabled={!bgColor}>背景色を適用</button>
                 </Modal>
 
                 <button className="bg-blue-300 btn" onClick={() => { let modal: any = document.getElementById("shere"); modal.showModal(); }}>

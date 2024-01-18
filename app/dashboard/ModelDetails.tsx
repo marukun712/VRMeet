@@ -10,7 +10,7 @@ type Props = {
     removeModel: (id: string, name: string) => Promise<void>
 }
 
-export default function ModelDetails(props: Props) {
+export default function ModelDetails(props: Props): JSX.Element {
     return (
         <div>
             <h2 className="text-2xl">{props.name}</h2>
