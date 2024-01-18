@@ -15,6 +15,8 @@ import { useRouter } from 'next/navigation'
 import { siteURL } from '@/constants/siteURL'
 import Header from '@/components/Header'
 import Drawer from '@/components/Drawer'
+import { VRMLoader } from '@/utils/motionCapture/VRMLoader'
+import { readAsDataURL, readAsText, readAsArrayBuffer } from 'promise-file-reader';
 
 export default function Dashboard({ session }: { session: Session | null }) {
     const supabase = createClientComponentClient();
@@ -143,15 +145,23 @@ export default function Dashboard({ session }: { session: Session | null }) {
         }
 
         const file = event.target.files[0]
-        const extension = file.name.split('.').pop(); //.vrm.pngのような拡張子がチェックを通過しないように最後の要素を取得する
-        if (extension !== "vrm") {
-            alert(".vrmのファイルのみアップロード可能です。")
-        } else {
-            uploadModel(file)
-            let model_url = await getFileURL(`${user?.id}/${file.name}`)
-            addModelToModelTable(model_url, file.name);
-            setModelURL(model_url)
-            updateModel({ model_url });
+
+        try {
+            const url: string = await readAsDataURL(file)
+            const model = await VRMLoader(url) //VRM-0.xのモデルかどうかチェックする
+
+            const extension = file.name.split('.').pop(); //.vrm.pngのような拡張子がチェックを通過しないように最後の要素を取得する
+            if (extension !== "vrm") {
+                alert(".vrmのファイルのみアップロード可能です。")
+            } else {
+                uploadModel(file)
+                let model_url = await getFileURL(`${user?.id}/${file.name}`)
+                addModelToModelTable(model_url, file.name);
+                setModelURL(model_url)
+                updateModel({ model_url });
+            }
+        } catch (e) {
+            alert("モデルのバージョンに互換性がありません。VRM-0.xのモデルを使用してください。");
         }
     }
 

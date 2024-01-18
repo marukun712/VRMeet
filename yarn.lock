@@ -2512,6 +2512,11 @@ posthtml@^0.16.4, posthtml@^0.16.5:
     posthtml-parser "^0.11.0"
     posthtml-render "^3.0.0"
 
+promise-file-reader@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/promise-file-reader/-/promise-file-reader-1.0.3.tgz#f18a983150077c7a34d1354da5813d4f35aaeae9"
+  integrity sha512-/sumzg8xjurm6PchjhlXb592lv3tFFaO13DtsFqbglhdZjCzxhDgvmPv/vMcarpfGiCRPC4ZvZ+YsV0am0d4+g==
+
 prop-types@^15.7.2:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"

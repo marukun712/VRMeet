@@ -27,6 +27,7 @@
         "daisyui": "^4.4.20",
         "kalidokit": "^1.1.5",
         "next": "14.0.4",
+        "promise-file-reader": "^1.0.3",
         "react": "^18",
         "react-dom": "^18",
         "three": "0.133.0",
