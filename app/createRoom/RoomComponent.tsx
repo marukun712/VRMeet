@@ -26,6 +26,7 @@ import { useRouter } from 'next/navigation'
 import { fetchUserNameFromID } from "@/utils/supabase/fetchUserNameFromID";
 import LoadingModal from "@/components/LoadingModal";
 import { siteURL } from "@/constants/siteURL";
+import Modal from "@/components/Modal";
 
 export default function CreateRoomDynamicComponent({ session }: { session: Session | null }) {
     const router = useRouter();
@@ -51,6 +52,7 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
     const { scene, createTransformControls } = useThreeJS(canvasRef); //ThreeJS Sceneの作成
 
     const finishLoading = useCallback(() => {
+        let modal: any = document.getElementById("hint"); modal.showModal();
         setIsLoading(false);
     }, [loading])
 
@@ -208,6 +210,10 @@ export default function CreateRoomDynamicComponent({ session }: { session: Sessi
         <div>
             {roomID && scene && myVRM ? <RoomMenu roomID={roomID} roomURL={`${siteURL}/joinRoom?id=${roomID}`} scene={scene} me={myVRM.user} /> : ""}
             {loading ? <LoadingModal message='ルームに参加中です。タブがフリーズすることがありますが、数秒で改善しますのでそのままお待ちください。' /> : ""}
+            <Modal id="hint">
+                <img src="/images/machine_3d_scanner.png" className="py-5 m-auto"></img>
+                <h1>Webカメラに全身が移る位置に移動すると、より正確に姿勢を反映できるようになります。</h1>
+            </Modal>
 
             {/* ログの表示 */}
             <div className="absolute bottom-14 right-14 w-96 h-64 overflow-scroll hidden md:block">

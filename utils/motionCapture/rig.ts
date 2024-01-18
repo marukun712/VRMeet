@@ -7,7 +7,7 @@ const clamp = Kalidokit.Utils.clamp;
 const lerp = Kalidokit.Vector.lerp;
 
 // Animate Rotation Helper function 
-export const rigRotation = (name: string, rotation: any = { x: 0, y: 0, z: 0 }, dampener: number, lerpAmount: number, currentVrm: VRM) => { //TODO 型エラーの解消
+export const rigRotation = (name: string, rotation: any = { x: 0, y: 0, z: 0 }, dampener: number, lerpAmount: number, currentVrm: VRM) => {
     if (!currentVrm || currentVrm.humanoid == null) {
         return;
     }

@@ -1,11 +1,6 @@
 # VRMeet
 
-<img src="https://img.shields.io/badge/-TypeScript-000000.svg?style=for-the-badge&logo=typescript&logoColor=61DAFB">
-<img src="https://img.shields.io/badge/-Nextjs-000000.svg?style=for-the-badge&logo=next.js&logoColor=61DAFB">
-<img src="https://img.shields.io/badge/-tailwindcss-000000.svg?style=for-the-badge&logo=tailwindcss&logoColor=61DAFB">
-<img src="https://img.shields.io/badge/-Supabase-000000.svg?style=for-the-badge&logo=supabase&logoColor=61DAFB">
-<img src="https://img.shields.io/badge/-three.js-000000.svg?style=for-the-badge&logo=threedotjs&logoColor=61DAFB">
-<img src="https://img.shields.io/badge/-webrtc-000000.svg?style=for-the-badge&logo=webrtc&logoColor=61DAFB">
+<img src="https://img.shields.io/badge/-TypeScript-000000.svg?style=for-the-badge&logo=typescript&logoColor=61DAFB"><img src="https://img.shields.io/badge/-Nextjs-000000.svg?style=for-the-badge&logo=next.js&logoColor=61DAFB"><img src="https://img.shields.io/badge/-tailwindcss-000000.svg?style=for-the-badge&logo=tailwindcss&logoColor=61DAFB"><img src="https://img.shields.io/badge/-Supabase-000000.svg?style=for-the-badge&logo=supabase&logoColor=61DAFB"><img src="https://img.shields.io/badge/-three.js-000000.svg?style=for-the-badge&logo=threedotjs&logoColor=61DAFB"><img src="https://img.shields.io/badge/-webrtc-000000.svg?style=for-the-badge&logo=webrtc&logoColor=61DAFB">
 
 必要なものはWebカメラだけ。Web上で手軽に複数人での3Dコラボを行うことができます。体を動かして遊ぶパーティーゲーム等の配信にもぴったりです。
 

@@ -24,7 +24,7 @@ export const startMediaPipeTracking = (cameraRef: RefObject<HTMLVideoElement>, d
     // トラッキング後のコールバック関数
     const onResults = (results: Results) => {
         if (videoElement == null || myVRM == null) { return }; //自分のVRMモデルがロード済みなら
-        if (loading) { finishLoading() }
+        if (loading) { finishLoading(); loading = false; }
         sendMessage(results) //モーションデータを送信
         animateVRM(myVRM.vrm, results, videoElement); //VRMモデルを動かす
     };

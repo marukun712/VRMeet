@@ -22,7 +22,7 @@ export default function Drawer(props: Props): JSX.Element {
             <div className="drawer-side">
                 <label htmlFor="my-drawer-2" aria-label="close sidebar" className="drawer-overlay"></label>
                 <ul className="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-                    <li><button onClick={() => { let modal: any = document.getElementById("model_setting"); modal.showModal(); }}>モデルの設定</button></li>
+                    <li><button onClick={() => { let modal: any = document.getElementById("model_setting"); modal.showModal(); }}>VRMモデルをアップロードして使用する</button></li>
                     <li><button onClick={() => { let modal: any = document.getElementById("user_setting"); modal.showModal(); }}>ユーザー情報の編集</button></li>
                 </ul>
             </div>

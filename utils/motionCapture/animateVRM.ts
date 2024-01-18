@@ -3,7 +3,7 @@ import { VRM } from '@pixiv/three-vrm'
 import { rigRotation, rigFace, rigPosition } from './rig';
 
 /* VRM Character Animator */
-export const animateVRM = (vrm: VRM, results: any, videoElement: HTMLVideoElement) => { //TODO 型エラーの解消
+export const animateVRM = (vrm: VRM, results: any, videoElement: HTMLVideoElement) => {
     if (!vrm) {
         return;
     }

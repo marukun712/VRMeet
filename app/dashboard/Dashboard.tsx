@@ -173,7 +173,9 @@ export default function Dashboard({ session }: { session: Session | null }) {
                                 className='input input-bordered input-primary w-full max-w-xs m-2'
                                 onChange={(e) => setRoomID(e.target.value)}
                             />
-                            <button className="btn btn-primary m-auto" onClick={() => router.push(`${siteURL}/joinRoom?id=${roomID}`)} disabled={!roomID}>既存のルームに参加</button>
+                            <div className="tooltip m-auto" data-tip="既存のルームに参加するには、ルームIDまたは招待リンクを共有してもらう必要があります。">
+                                <button className="btn btn-primary" onClick={() => router.push(`${siteURL}/joinRoom?id=${roomID}`)} disabled={!roomID}>既存のルームに参加</button>
+                            </div>
                         </div>
 
                         <Modal id="model_setting">
