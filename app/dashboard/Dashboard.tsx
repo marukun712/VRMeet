@@ -184,7 +184,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                                 onChange={(e) => setRoomID(e.target.value)}
                             />
                             <div className="tooltip m-auto" data-tip="既存のルームに参加するには、ルームIDまたは招待リンクを共有してもらう必要があります。">
-                                <button className="btn btn-primary" onClick={() => router.push(`${siteURL}/joinRoom?id=${roomID}`)} disabled={!roomID}>既存のルームに参加</button>
+                                <button className="btn btn-primary" onClick={() => router.push(`${siteURL}/room/${roomID}`)} disabled={!roomID}>既存のルームに参加</button>
                             </div>
                         </div>
 

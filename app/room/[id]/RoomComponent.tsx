@@ -16,7 +16,7 @@ import { animateVRM } from "@/utils/motionCapture/animateVRM";
 import { getToken } from "@/utils/skyway/getToken";
 import { userAndVRMData, motionData, controlData } from "@/types";
 import { Session } from '@supabase/auth-helpers-nextjs'
-import { useSearchParams } from "next/navigation";
+import { useParams } from 'next/navigation';
 import { fetchModelURLFromID } from "@/utils/supabase/fetchModelFromID";
 import { useUser } from "@/hooks/useUser";
 import { useThreeJS } from "@/hooks/useThreeJS";
@@ -30,12 +30,14 @@ import Modal from "@/components/Modal";
 
 export default function JoinRoomDynamicComponent({ session }: { session: Session | null }) {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const id = searchParams.get("id"); //ルームIDの取得
-
+    const id = useParams().id; //パスパラメーターからルームIDを取得
     if (!session) {
         alert("先にログインしてください！")
         router.push("/")
+        return;
+    }
+    if (typeof id !== "string") {
+        alert("ルームIDの取得に失敗しました。")
         return;
     }
 
@@ -91,13 +93,14 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
         scene.add(otherVRMModel.scene);
         if (!usedSpawnPoint) { //モデルの初期位置が被らないように切り替え
             otherVRMModel.scene.position.x = 2
+            usedSpawnPoint = true;
         } else {
             otherVRMModel.scene.position.x = -2
         }
 
         otherVRMModel.scene.rotation.y = Math.PI;
 
-        let transformControls = createTransformControls(otherVRMModel.scene)!;
+        let transformControls = createTransformControls(otherVRMModel.scene)!; //モデルの位置を調節するためのコントロールの作成とIDとの紐づけ
         controls.push({ control: transformControls, id: user.id });
 
         let remoteMemberVRM: userAndVRMData = { user: user, vrm: otherVRMModel }; //idからモデルを参照できるようにユーザーデータとモデルデータをオブジェクトに格納
@@ -140,18 +143,18 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
             const dataStream = await SkyWayStreamFactory.createDataStream();
             setDataStream(dataStream);
 
-            if (token == null || dataStream == null || id == null) { return; };
+            if (token == null || dataStream == null) { return; };
             const context = await SkyWayContext.Create(token);
 
             //roomの取得
-            const room = await SkyWayRoom.Find(context, {
+            const room = await SkyWayRoom.FindOrCreate(context, {
+                type: 'p2p',
                 name: id,
-            }, "p2p");
+            });
 
-
-            //同時接続数を最大3名までに設定
+            //同時接続数を最大3名までに
             if (room.members.length >= 3) {
-                console.log("人数が上限に達しています");
+                alert("ルームの同時接続人数が上限に達しています!");
                 return;
             }
 
@@ -187,7 +190,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
             //publicationsの追加時に実行
             room.onStreamPublished.add((e) => subscribeAndAttach(e.publication, me));
         } catch (e) {
-            alert("問題が発生しました。ルームIDが間違っている可能性があります。");
+            alert("ルームの入室中にエラーが発生しました。再試行してください。");
         }
     }, [scene, dataStream, myVRM, otherVRMData])
 
@@ -210,7 +213,7 @@ export default function JoinRoomDynamicComponent({ session }: { session: Session
 
     return (
         <div>
-            {id && scene && myVRM ? <RoomMenu roomID={id} roomURL={`${siteURL}/joinRoom?id=${id}`} scene={scene} me={myVRM.user} /> : ""}
+            {id && scene && myVRM ? <RoomMenu roomID={id} roomURL={`${siteURL}/room/${id}`} scene={scene} me={myVRM.user} /> : ""}
             {loading ? <LoadingModal message='ルームに参加中です。タブがフリーズすることがありますが、数秒で改善しますのでそのままお待ちください。' /> : ""}
             <Modal id="hint">
                 <img src="/images/machine_3d_scanner.png" className="py-5 m-auto"></img>

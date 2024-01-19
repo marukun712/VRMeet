@@ -1,17 +1,8 @@
-import dynamic from "next/dynamic";
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+'use client'
+import { useRouter } from "next/navigation"
+import { v4 } from "uuid"
 
-export default async function CreateRoom() {
-    //error ReferenceError: RTCPeerConnection is not defined回避のためにDynamicComponentとしてimport
-    let DynamicComponent = dynamic(() => import("./RoomComponent"), {
-        ssr: false,
-    });
-    const supabase = createServerComponentClient({ cookies })
-
-    const {
-        data: { session },
-    } = await supabase.auth.getSession()
-
-    return <DynamicComponent session={session} />
+export default function CreateRoom() {
+    const router = useRouter()
+    router.push(`/room/${v4()}`) //新しいルームIDを生成
 }
