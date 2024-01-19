@@ -239,7 +239,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
 
                         <div className='py-10 flex justify-center'>
                             <div>
-                                <Link href={"/createRoom"} className='btn bg-green-500'>ルームを新規作成</Link>
+                                <Link href={`/room/${v4()}`} className='btn bg-green-500'>ルームを新規作成</Link>
                                 <SignOutForm />
                             </div>
                         </div>
