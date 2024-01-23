@@ -16,7 +16,7 @@ import { siteURL } from '@/constants/siteURL'
 import Header from '@/components/Header'
 import Drawer from '@/components/Drawer'
 import { VRMLoader } from '@/utils/motionCapture/VRMLoader'
-import { readAsDataURL, readAsText, readAsArrayBuffer } from 'promise-file-reader';
+import { readAsDataURL } from 'promise-file-reader';
 
 export default function Dashboard({ session }: { session: Session | null }) {
     const supabase = createClientComponentClient();
@@ -227,6 +227,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                                 />
                             </div>
                             <div>
+                                <p className='text-gray-500 text-sm my-5'>※ボタンをクリックすることで編集が確定されます。</p>
                                 <button
                                     className="btn btn-primary"
                                     onClick={() => { if (fullname == undefined) { return; } updateProfile({ fullname }) }}

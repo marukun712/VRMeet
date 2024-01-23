@@ -5,6 +5,14 @@
 <img src="./public/images/logo.png">
 
 必要なものはWebカメラだけ。Web上で手軽に複数人での3Dコラボを行うことができます。体を動かして遊ぶパーティーゲーム等の配信にもぴったりです。
+# DEMO
+<img src="./public/images/top.png">
+
+# Features
+- Webカメラだけで簡単に姿勢を推定してVRMモデルに反映
+- SkyWayを用いた複数人でのモーションデータの同期
+- 最大3人までのルーム作成機能
+- VRMモデルのアップロード機能
 
 # Usage
 
@@ -26,3 +34,6 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 yarn run dev
 ```
+
+# License 
+VRMeet is under [MIT license]().

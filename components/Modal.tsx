@@ -10,12 +10,11 @@ export default function Modal(props: Props): JSX.Element {
             <dialog id={props.id} className="modal modal-bottom sm:modal-middle">
                 <div className="modal-box">
                     <div>{props.children}</div>
-                    <div className="modal-action">
-                        <form method="dialog">
-                            <button className="btn btn-primary">Close</button>
-                        </form>
-                    </div>
                 </div>
+
+                <form method="dialog" className="modal-backdrop">
+                    <button>close</button>
+                </form>
             </dialog>
         </div>
     )
