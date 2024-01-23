@@ -36,4 +36,4 @@ yarn run dev
 ```
 
 # License 
-VRMeet is under [MIT license]().
+VRMeet is under [MIT license](https://github.com/marukun712/VRMeet/blob/main/LICENSE).
