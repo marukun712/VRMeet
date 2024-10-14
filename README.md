@@ -4,24 +4,29 @@
 
 <img src="./public/images/logo.png">
 
-必要なものはWebカメラだけ。Web上で手軽に複数人での3Dコラボを行うことができます。体を動かして遊ぶパーティーゲーム等の配信にもぴったりです。
+必要なものは Web カメラだけ。Web 上で手軽に複数人での 3D コラボを行うことができます。体を動かして遊ぶパーティーゲーム等の配信にもぴったりです。
+
 # DEMO
+
 <img src="./public/images/top.png">
 
 # Features
-- Webカメラだけで簡単に姿勢を推定してVRMモデルに反映
-- SkyWayを用いた複数人でのモーションデータの同期
-- 最大3人までのルーム作成機能
-- VRMモデルのアップロード機能
+
+- Web カメラだけで簡単に姿勢を推定して VRM モデルに反映
+- SkyWay を用いた複数人でのモーションデータの同期
+- 最大 3 人までのルーム作成機能
+- VRM モデルのアップロード機能
 
 # Usage
 
 依存ライブラリのインストール。
+
 ```
 yarn install
 ```
 
-必要な認証情報を.env.localに記載。
+必要な認証情報を.env.local に記載。
+
 ```
 SKYWAY_APP_ID=
 SKYWAY_SECRET_KEY=
@@ -31,9 +36,11 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
 
 開発サーバーの起動。
+
 ```
 yarn run dev
 ```
 
-# License 
+# License
+
 VRMeet is under [MIT license](https://github.com/marukun712/VRMeet/blob/main/LICENSE).
