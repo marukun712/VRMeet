@@ -26,6 +26,7 @@
         "@types/uuid": "^9.0.7",
         "daisyui": "^4.4.20",
         "kalidokit": "^1.1.5",
+        "lucide-react": "^0.453.0",
         "next": "14.0.4",
         "promise-file-reader": "^1.0.3",
         "react": "^18",

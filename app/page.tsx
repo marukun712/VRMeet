@@ -1,8 +1,8 @@
 "use client";
-import Header from "@/components/Header";
-import AuthButton from "@/components/AuthButton";
-import BackGround from "@/components/BackGround";
-import GlassCard from "@/components/GlassCard";
+import Header from "@/components/ui/Header";
+import AuthButton from "@/components/ui/AuthButton";
+import BackGround from "@/components/TopPage/BackGround";
+import GlassCard from "@/components/TopPage/GlassCard";
 
 export default function Home(): JSX.Element {
   return (

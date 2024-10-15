@@ -4,22 +4,23 @@ import {
   createClientComponentClient,
 } from "@supabase/auth-helpers-nextjs";
 import { ChangeEvent } from "react";
-import LoadingModal from "@/components/LoadingModal";
-import UserIcon from "./UserIcon";
-import SignOutForm from "./SignOutForm";
+import LoadingModal from "@/components/ui/LoadingModal";
+import UserIcon from "../../components/dashboard/UserIcon";
+import SignOutForm from "../../components/dashboard/SignOutForm";
 import { useUser } from "@/hooks/useUser";
 import Link from "next/link";
-import Modal from "@/components/Modal";
+import Modal from "@/components/ui/Modal";
 import { v4 } from "uuid";
 import { useModel } from "@/hooks/useModel";
-import ModelDetails from "./ModelDetails";
+import ModelDetails from "../../components/dashboard/ModelDetails";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { siteURL } from "@/constants/siteURL";
-import Header from "@/components/Header";
-import Drawer from "@/components/Drawer";
+import Header from "@/components/ui/Header";
+import Drawer from "@/components/dashboard/Drawer";
 import { VRMLoader } from "@/utils/motionCapture/VRMLoader";
 import { readAsDataURL } from "promise-file-reader";
+import { Check, LogIn, Plus } from "lucide-react";
 
 export default function Dashboard({ session }: { session: Session | null }) {
   const supabase = createClientComponentClient();
@@ -111,9 +112,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
   };
 
   const removeModel = async (id: string, name: string) => {
-    const { data } = await supabase.storage
-      .from("models")
-      .remove([`${user.id}/${name}`]);
+    await supabase.storage.from("models").remove([`${user.id}/${name}`]);
 
     const { error } = await supabase.from("models").delete().eq("id", id);
 
@@ -154,7 +153,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
 
     try {
       const url: string = await readAsDataURL(file);
-      const model = await VRMLoader(url); //VRM-0.xのモデルかどうかチェックする
+      await VRMLoader(url); //VRM-0.xのモデルかどうかチェックする
 
       const extension = file.name.split(".").pop(); //.vrm.pngのような拡張子がチェックを通過しないように最後の要素を取得する
       if (extension !== "vrm") {
@@ -181,7 +180,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
         <div className="flex py-5">
           <div>
             {fullname ? (
-              <h1 className="text-2xl py-10 text-center">
+              <h1 className="text-2xl text-center">
                 {fullname}さん、ようこそ。
               </h1>
             ) : (
@@ -274,7 +273,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                   ※ボタンをクリックすることで編集が確定されます。
                 </p>
                 <button
-                  className="btn btn-primary"
+                  className="btn bg-green-500"
                   onClick={() => {
                     if (fullname == undefined) {
                       return;
@@ -283,6 +282,8 @@ export default function Dashboard({ session }: { session: Session | null }) {
                   }}
                   disabled={loading || !fullname}
                 >
+                  <Check />
+
                   {loading ? "Loading ..." : "保存"}
                 </button>
               </div>
@@ -291,6 +292,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
             <div className="py-10 flex justify-center">
               <div>
                 <Link href={`/room/${v4()}`} className="btn bg-green-500">
+                  <Plus />
                   ルームを新規作成
                 </Link>
                 <SignOutForm />

@@ -1,3 +1,5 @@
+import { Check, Trash2 } from "lucide-react";
+
 type Props = {
   id: string;
   url: string;
@@ -15,12 +17,13 @@ export default function ModelDetails(props: Props): JSX.Element {
     <div>
       <h2 className="text-2xl">{props.name}</h2>
       <button
-        className="btn w-24 btn-primary"
+        className="btn w-24 bg-green-500"
         onClick={() => {
           let model_url: string = props.url;
           props.changeMainModel({ model_url });
         }}
       >
+        <Check />
         使う
       </button>
       <button
@@ -31,6 +34,7 @@ export default function ModelDetails(props: Props): JSX.Element {
           props.removeModel(id, name);
         }}
       >
+        <Trash2 />
         削除
       </button>
     </div>
