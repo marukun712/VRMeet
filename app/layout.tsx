@@ -4,6 +4,7 @@ import { Noto_Sans_JP as NotoSansJP } from "next/font/google"; //as NotoSansJP„Å
 const notosansJP = NotoSansJP({
   subsets: ["latin"],
   variable: "--font-noto-sans-jp",
+  display: "swap",
 });
 
 export const metadata: Metadata = {

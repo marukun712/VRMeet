@@ -17,7 +17,7 @@ export default function ModelDetails(props: Props): JSX.Element {
   return (
     <div>
       <h2 className="text-2xl">{props.name}</h2>
-      <img src={props.image_url}></img>
+      <img src={props.image_url} className="rounded-md w-1/2 h-1/2"></img>
       <button
         className="btn w-24 bg-green-500"
         onClick={() => {

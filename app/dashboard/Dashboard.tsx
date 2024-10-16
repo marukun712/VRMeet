@@ -111,10 +111,6 @@ export default function Dashboard({ session }: { session: Session | null }) {
     if (error) {
       alert("モデルのアップロードに失敗しました。");
     }
-
-    if (data) {
-      alert("モデルのアップロードに成功しました!");
-    }
   };
 
   const removeModel = async (id: string) => {
@@ -163,15 +159,10 @@ export default function Dashboard({ session }: { session: Session | null }) {
     try {
       const file = event.target.files[0];
       const meta = await getVRMMeta(file);
-      const version = await checkVRMVersion(file);
       const id = v4();
 
       if (!meta || !meta.image) {
         alert("メタデータの取得に失敗しました。");
-        return;
-      }
-      if (!version) {
-        alert("VRM 0.xのモデルのみアップロード可能です。");
         return;
       }
 
@@ -187,13 +178,14 @@ export default function Dashboard({ session }: { session: Session | null }) {
         updateModel({ model_url });
       }
     } catch (e) {
-      alert("モデルのアップロードに失敗しました。");
+      alert("VRM 0.xのモデルのみアップロード可能です。");
     }
   };
 
   return (
     <div>
       <Header />
+
       <Drawer>
         {loading ? <LoadingModal message="ユーザーデータを取得中..." /> : ""}
 

@@ -172,7 +172,10 @@ export async function checkVRMVersion(file: File) {
   const jsonData = getJSONData(ds);
   if (!jsonData) return;
 
-  if (jsonData.json.extensions.VRM.specVersion) {
+  // @ts-ignore
+  const version = jsonData.json.extensions.VRM.specVersion;
+
+  if (version) {
     return true;
   } else {
     return false;
