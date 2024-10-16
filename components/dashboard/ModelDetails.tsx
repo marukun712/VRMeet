@@ -4,6 +4,7 @@ type Props = {
   id: string;
   url: string;
   name: string;
+  image_url: string;
   changeMainModel: ({
     model_url,
   }: {
@@ -16,6 +17,7 @@ export default function ModelDetails(props: Props): JSX.Element {
   return (
     <div>
       <h2 className="text-2xl">{props.name}</h2>
+      <img src={props.image_url}></img>
       <button
         className="btn w-24 bg-green-500"
         onClick={() => {

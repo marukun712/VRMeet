@@ -18,9 +18,8 @@ import { useRouter } from "next/navigation";
 import { siteURL } from "@/constants/siteURL";
 import Header from "@/components/ui/Header";
 import Drawer from "@/components/dashboard/Drawer";
-import { VRMLoader } from "@/utils/motionCapture/VRMLoader";
-import { readAsDataURL } from "promise-file-reader";
-import { Check, LogIn, Plus } from "lucide-react";
+import { Check, Plus } from "lucide-react";
+import { checkVRMVersion, getVRMMeta } from "@/utils/motionCapture/getVRMMeta";
 
 export default function Dashboard({ session }: { session: Session | null }) {
   const supabase = createClientComponentClient();
@@ -70,7 +69,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
     }
   };
 
-  //モデルの更新
+  //使用モデルの更新(profile内)
   const updateModel = async ({ model_url }: { model_url: string | null }) => {
     try {
       setLoading(true);
@@ -94,10 +93,17 @@ export default function Dashboard({ session }: { session: Session | null }) {
     }
   };
 
-  const uploadModel = async (file: File) => {
+  const uploadModel = async (id: string, modelFile: File, imageFile: File) => {
     const { data, error } = await supabase.storage
       .from("models")
-      .upload(`${user?.id}/${file.name}`, file, {
+      .upload(`${user?.id}/${id}.vrm`, modelFile, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    await supabase.storage
+      .from("models")
+      .upload(`${user?.id}/${id}.png`, imageFile, {
         cacheControl: "3600",
         upsert: false,
       });
@@ -111,8 +117,9 @@ export default function Dashboard({ session }: { session: Session | null }) {
     }
   };
 
-  const removeModel = async (id: string, name: string) => {
-    await supabase.storage.from("models").remove([`${user.id}/${name}`]);
+  const removeModel = async (id: string) => {
+    await supabase.storage.from("models").remove([`${user.id}/${id}.vrm`]);
+    await supabase.storage.from("models").remove([`${user.id}/${id}.png`]);
 
     const { error } = await supabase.from("models").delete().eq("id", id);
 
@@ -133,10 +140,15 @@ export default function Dashboard({ session }: { session: Session | null }) {
   };
 
   //モデル一覧テーブルにモデル情報を追加する
-  const addModelToModelTable = async (model_url: string, name: string) => {
+  const addModelToModelTable = async (
+    id: string,
+    model_url: string,
+    name: string,
+    image_url: string
+  ) => {
     const { error } = await supabase
       .from("models")
-      .insert({ id: v4(), url: model_url, name: name, user_id: user.id });
+      .insert({ id, url: model_url, name, image_url, user_id: user.id });
 
     if (error) {
       console.error(error);
@@ -148,27 +160,34 @@ export default function Dashboard({ session }: { session: Session | null }) {
     if (!event.target.files || event.target.files.length == 0) {
       return;
     }
-
-    const file = event.target.files[0];
-
     try {
-      const url: string = await readAsDataURL(file);
-      await VRMLoader(url); //VRM-0.xのモデルかどうかチェックする
+      const file = event.target.files[0];
+      const meta = await getVRMMeta(file);
+      const version = await checkVRMVersion(file);
+      const id = v4();
+
+      if (!meta || !meta.image) {
+        alert("メタデータの取得に失敗しました。");
+        return;
+      }
+      if (!version) {
+        alert("VRM 0.xのモデルのみアップロード可能です。");
+        return;
+      }
 
       const extension = file.name.split(".").pop(); //.vrm.pngのような拡張子がチェックを通過しないように最後の要素を取得する
       if (extension !== "vrm") {
         alert(".vrmのファイルのみアップロード可能です。");
       } else {
-        uploadModel(file);
-        let model_url = await getFileURL(`${user?.id}/${file.name}`);
-        addModelToModelTable(model_url, file.name);
+        uploadModel(id, file, meta.image);
+        let model_url = await getFileURL(`${user?.id}/${id}.vrm`);
+        let image_url = await getFileURL(`${user?.id}/${id}.png`);
+        addModelToModelTable(id, model_url, meta.name, image_url);
         setModelURL(model_url);
         updateModel({ model_url });
       }
     } catch (e) {
-      alert(
-        "モデルのバージョンに互換性がありません。VRM-0.xのモデルを使用してください。"
-      );
+      alert("モデルのアップロードに失敗しました。");
     }
   };
 
@@ -177,6 +196,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
       <Header />
       <Drawer>
         {loading ? <LoadingModal message="ユーザーデータを取得中..." /> : ""}
+
         <div className="flex py-5">
           <div>
             {fullname ? (
@@ -224,6 +244,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                       <ModelDetails
                         url={data.url}
                         name={data.name}
+                        image_url={data.image_url}
                         id={data.id}
                         changeMainModel={updateModel}
                         removeModel={removeModel}
@@ -236,6 +257,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                       <ModelDetails
                         url={data.url}
                         name={data.name}
+                        image_url={data.image_url}
                         id={data.id}
                         changeMainModel={updateModel}
                         removeModel={removeModel}

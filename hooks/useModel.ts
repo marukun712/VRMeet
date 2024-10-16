@@ -6,13 +6,13 @@ export const useModel = (userId: string) => {
   const supabase = createClientComponentClient();
 
   const [myModels, setMyModels] = useState<
-    { url: string; name: string; id: string }[]
+    { id: string; url: string; name: string; image_url: string }[]
   >([]);
 
   const getModel = useCallback(async () => {
     const { data, error } = await supabase
       .from("models")
-      .select("id,url,name")
+      .select("id,url,name,image_url")
       .eq("user_id", userId);
 
     if (data) {
