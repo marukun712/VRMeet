@@ -1,4 +1,5 @@
 import { Check, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 type Props = {
   id: string;
@@ -17,7 +18,9 @@ export default function ModelDetails(props: Props): JSX.Element {
   return (
     <div>
       <h2 className="text-2xl">{props.name}</h2>
-      <img src={props.image_url} className="rounded-md w-1/2 h-1/2"></img>
+      <Link href={`/model/${props.id}`}>
+        <img src={props.image_url} className="rounded-md"></img>
+      </Link>
       <button
         className="btn w-24 bg-green-500"
         onClick={() => {

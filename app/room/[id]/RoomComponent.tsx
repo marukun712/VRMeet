@@ -21,12 +21,12 @@ import { fetchModelURLFromID } from "@/utils/supabase/fetchModelFromID";
 import { useUser } from "@/hooks/useUser";
 import { useThreeJS } from "@/hooks/useThreeJS";
 import { startMediaPipeTracking } from "@/utils/motionCapture/startMediaPipeTracking";
-import RoomMenu from "@/components/room/RoomMenu";
+import RoomMenu from "@/components/room/roomMenu";
 import { useRouter } from "next/navigation";
 import { fetchUserNameFromID } from "@/utils/supabase/fetchUserNameFromID";
-import LoadingModal from "@/components/ui/LoadingModal";
+import LoadingModal from "@/components/ui/loadingModal";
 import { siteURL } from "@/constants/siteURL";
-import Modal from "@/components/ui/Modal";
+import Modal from "@/components/ui/modal";
 
 export default function JoinRoomDynamicComponent({
   session,

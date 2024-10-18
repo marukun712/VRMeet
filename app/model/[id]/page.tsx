@@ -1,6 +1,6 @@
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
-import Dashboard from "./dashboard";
+import ModelDetails from "./modelDetails";
 
 export default async function Page() {
   const supabase = createServerComponentClient({ cookies });
@@ -9,5 +9,5 @@ export default async function Page() {
     data: { session },
   } = await supabase.auth.getSession();
 
-  return <Dashboard session={session} />;
+  return <ModelDetails session={session} />;
 }

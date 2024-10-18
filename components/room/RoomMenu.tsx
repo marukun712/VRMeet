@@ -1,5 +1,5 @@
 import { RoomMember } from "@skyway-sdk/room";
-import Modal from "../ui/Modal";
+import Modal from "../ui/modal";
 import { useRef } from "react";
 import { useState } from "react";
 import * as THREE from "three";

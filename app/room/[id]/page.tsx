@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 
 export default async function Room() {
   //error ReferenceError: RTCPeerConnection is not defined回避のためにDynamicComponentとしてimport
-  let DynamicComponent = dynamic(() => import("./RoomComponent"), {
+  let DynamicComponent = dynamic(() => import("./roomComponent"), {
     ssr: false,
   });
   const supabase = createServerComponentClient({ cookies });

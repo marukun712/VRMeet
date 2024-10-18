@@ -4,22 +4,22 @@ import {
   createClientComponentClient,
 } from "@supabase/auth-helpers-nextjs";
 import { ChangeEvent } from "react";
-import LoadingModal from "@/components/ui/LoadingModal";
-import UserIcon from "../../components/dashboard/UserIcon";
-import SignOutForm from "../../components/dashboard/SignOutForm";
+import LoadingModal from "@/components/ui/loadingModal";
+import UserIcon from "../../components/dashboard/userIcon";
+import SignOutForm from "../../components/dashboard/signOutForm";
 import { useUser } from "@/hooks/useUser";
 import Link from "next/link";
-import Modal from "@/components/ui/Modal";
+import Modal from "@/components/ui/modal";
 import { v4 } from "uuid";
 import { useModel } from "@/hooks/useModel";
-import ModelDetails from "../../components/dashboard/ModelDetails";
+import ModelDetails from "../../components/dashboard/modelCard";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { siteURL } from "@/constants/siteURL";
-import Header from "@/components/ui/Header";
-import Drawer from "@/components/dashboard/Drawer";
+import Header from "@/components/ui/header";
+import Drawer from "@/components/dashboard/drawer";
 import { Check, Plus } from "lucide-react";
-import { checkVRMVersion, getVRMMeta } from "@/utils/motionCapture/getVRMMeta";
+import { getVRMMeta } from "@/utils/motionCapture/getVRMMeta";
 
 export default function Dashboard({ session }: { session: Session | null }) {
   const supabase = createClientComponentClient();
@@ -94,7 +94,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
   };
 
   const uploadModel = async (id: string, modelFile: File, imageFile: File) => {
-    const { data, error } = await supabase.storage
+    const { error } = await supabase.storage
       .from("models")
       .upload(`${user?.id}/${id}.vrm`, modelFile, {
         cacheControl: "3600",
