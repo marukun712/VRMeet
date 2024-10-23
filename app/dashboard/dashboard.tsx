@@ -168,6 +168,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
       if (extension !== "vrm") {
         alert(".vrmのファイルのみアップロード可能です。");
       } else {
+        setLoading(true);
         await uploadModel(id, file, meta.image);
         let model_url = await getFileURL(`${user?.id}/${id}.vrm`);
         let image_url = await getFileURL(`${user?.id}/${id}.png`);
@@ -185,7 +186,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
       <Header />
 
       <Drawer>
-        {loading ? <LoadingModal message="ユーザーデータを取得中..." /> : ""}
+        {loading ? <LoadingModal message="ロード中..." /> : ""}
 
         <div className="flex py-5">
           <div>
