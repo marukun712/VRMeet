@@ -101,7 +101,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
         upsert: false,
       });
 
-    await supabase.storage
+    const { error: imgErr } = await supabase.storage
       .from("models")
       .upload(`${user?.id}/${id}.png`, imageFile, {
         cacheControl: "3600",
@@ -110,6 +110,11 @@ export default function Dashboard({ session }: { session: Session | null }) {
 
     if (error) {
       alert("モデルのアップロードに失敗しました。");
+    }
+
+    if (imgErr) {
+      console.log(imgErr);
+      alert("画像のアップロードに失敗しました。");
     }
   };
 
