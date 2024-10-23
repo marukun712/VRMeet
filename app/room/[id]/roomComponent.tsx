@@ -106,7 +106,7 @@ export default function JoinRoomDynamicComponent({
     let url = await fetchModelURLFromID(user.metadata);
     if (!url) {
       url =
-        "https://azfrevyqvbsilqhxhlxn.supabase.co/storage/v1/object/public/models/AliciaSolid.vrm?t=2024-01-18T06%3A53%3A41.813Z";
+        "https://iovskyppmnvtlcenixfn.supabase.co/storage/v1/object/public/models/AliciaSolid.vrm?t=2024-10-23T10%3A57%3A22.844Z";
     } //初期モデルをロード
     //VRMモデルの読み込み
     let otherVRMModel: VRM = await VRMLoader(url);
@@ -244,7 +244,7 @@ export default function JoinRoomDynamicComponent({
         "アップロードされたモデルが見つかりませんでした。代わりに初期モデルをロードします。"
       );
       joinRoom(
-        "https://azfrevyqvbsilqhxhlxn.supabase.co/storage/v1/object/public/models/AliciaSolid.vrm?t=2024-01-18T06%3A53%3A41.813Z"
+        "https://iovskyppmnvtlcenixfn.supabase.co/storage/v1/object/public/models/AliciaSolid.vrm?t=2024-10-23T10%3A57%3A22.844Z"
       ); //初期モデルを使用する
       return;
     }
