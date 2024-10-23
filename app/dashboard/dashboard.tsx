@@ -168,6 +168,8 @@ export default function Dashboard({ session }: { session: Session | null }) {
       if (extension !== "vrm") {
         alert(".vrmのファイルのみアップロード可能です。");
       } else {
+        let modal: any = document.getElementById("model_setting");
+        modal.close();
         setLoading(true);
         await uploadModel(id, file, meta.image);
         let model_url = await getFileURL(`${user?.id}/${id}.vrm`);
