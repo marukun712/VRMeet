@@ -96,24 +96,17 @@ export default function Dashboard({ session }: { session: Session | null }) {
   const uploadModel = async (id: string, modelFile: File, imageFile: File) => {
     const { error } = await supabase.storage
       .from("models")
-      .upload(`${user?.id}/${id}.vrm`, modelFile, {
-        cacheControl: "3600",
-        upsert: false,
-      });
+      .upload(`${user?.id}/${id}.vrm`, modelFile);
 
     const { error: imgErr } = await supabase.storage
       .from("models")
-      .upload(`${user?.id}/${id}.png`, imageFile, {
-        cacheControl: "3600",
-        upsert: false,
-      });
+      .upload(`${user?.id}/${id}.png`, imageFile);
 
     if (error) {
       alert("モデルのアップロードに失敗しました。");
     }
 
     if (imgErr) {
-      console.log(imgErr);
       alert("画像のアップロードに失敗しました。");
     }
   };
