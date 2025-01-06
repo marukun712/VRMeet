@@ -293,8 +293,8 @@ export default function JoinRoomDynamicComponent({
       <div>
         <video
           className="hidden"
-          width="1280px"
-          height="720px"
+          width="1920px"
+          height="1080px"
           ref={cameraRef}
         ></video>
         <canvas ref={canvasRef} className="w-full h-full"></canvas>

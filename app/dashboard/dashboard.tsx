@@ -227,6 +227,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
               <h1 className="text-2xl">モデル設定</h1>
 
               <h1>アップロードされているモデル</h1>
+
               {myModels.map((data) => {
                 if (modelURL === data.url) {
                   return (
@@ -234,6 +235,7 @@ export default function Dashboard({ session }: { session: Session | null }) {
                       <h1 className="w-20 rounded-full text-center bg-green-500">
                         使用中
                       </h1>
+
                       <ModelDetails
                         url={data.url}
                         name={data.name}

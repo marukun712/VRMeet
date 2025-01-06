@@ -30,9 +30,9 @@ export default function MetaData(props: Props): JSX.Element {
             ライセンスタイプ:{props.meta.licenseName}
           </h1>
           <h1 className="text-black my-5">メタデータ詳細:</h1>
-          <pre className="text-black overflow-scroll h-64">
+          <pre className="text-black overflow-scroll w-96 h-64">
             {JSON.stringify(props.meta, null, 2)}
-          </pre>{" "}
+          </pre>
         </div>
       </div>
 

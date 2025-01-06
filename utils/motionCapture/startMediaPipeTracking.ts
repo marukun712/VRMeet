@@ -70,8 +70,8 @@ export const startMediaPipeTracking = (
       }
       await holistic.send({ image: videoElement });
     },
-    width: 1280, //解像度を下げるほどFPSが向上する
-    height: 720,
+    width: 1920, //解像度を下げるほどFPSが向上する
+    height: 1080,
   });
 
   const startCamera = async () => {
